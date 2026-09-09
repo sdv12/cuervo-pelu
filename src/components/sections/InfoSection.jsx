@@ -1,5 +1,5 @@
-import { MessageCircle, Instagram } from 'lucide-react'
-import { WHATSAPP_NUMBER, INSTAGRAM_URL } from '../../config/contact'
+import { MessageCircle, Instagram, MapPin } from 'lucide-react'
+import { WHATSAPP_NUMBER, INSTAGRAM_URL, DIRECCION, MAPS_URL } from '../../config/contact'
 
 export default function InfoSection() {
   return (
@@ -41,6 +41,14 @@ export default function InfoSection() {
             >
               <Instagram size={16} />
               @elcuervopeluqueria
+            </a>
+            <a
+              className="inline-flex items-center gap-2 text-[0.95rem] font-semibold text-rojo no-underline dark:text-navy-accent"
+              target="_blank" rel="noopener"
+              href={MAPS_URL}
+            >
+              <MapPin size={16} />
+              {DIRECCION}
             </a>
           </div>
         </div>

@@ -78,6 +78,18 @@ const bookingService = {
     await delay(350)
     return MOCK_DB.clientes[telefono] || null
   },
+
+  // TODO(supabase): update turnos set estado='cancelado' where fecha=... and hora=... and telefono=...
+  // + decrementar clientes.cortes_count (un turno cancelado no debe contar para la fidelidad)
+  async cancelarTurno({ fecha, hora, telefono }) {
+    await delay(350)
+    const turno = MOCK_DB.turnos.find(t => t.fecha === fecha && t.hora === hora && t.telefono === telefono)
+    if (!turno || turno.estado === 'cancelado') return false
+    turno.estado = 'cancelado'
+    const cliente = MOCK_DB.clientes[telefono]
+    if (cliente) cliente.cortes_count = Math.max(0, cliente.cortes_count - 1)
+    return true
+  },
 }
 
 export default bookingService

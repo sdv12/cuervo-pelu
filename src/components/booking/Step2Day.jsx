@@ -1,11 +1,21 @@
 import { useBooking } from '../../context/BookingContext'
 
+function rangoDeMeses(dias) {
+  const meses = [...new Set(dias.map(d => d.fecha.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })))]
+  return meses.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(' / ')
+}
+
 export default function Step2Day() {
   const { state, diasHabiles, seleccionarDia, irAPaso } = useBooking()
 
   return (
     <div>
-      <h3 className="mb-4 text-[1.2rem] uppercase text-azul dark:text-navy-text">Elegí el día</h3>
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 className="text-[1.2rem] uppercase text-azul dark:text-navy-text">Elegí el día</h3>
+        <span className="text-[0.8rem] font-semibold uppercase tracking-wide text-tinta-suave dark:text-navy-soft">
+          {rangoDeMeses(diasHabiles)}
+        </span>
+      </div>
       <div className="flex gap-2.5 overflow-x-auto pb-1.5 -mx-1 px-1">
         {diasHabiles.map(d => {
           const selected = state.day === d.label

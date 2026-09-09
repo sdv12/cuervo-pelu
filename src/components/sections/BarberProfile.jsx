@@ -9,7 +9,7 @@ export default function BarberProfile() {
       </div>
       <div>
         <h3 className="mb-1.5 text-[1.1rem] normal-case text-azul dark:text-navy-text">
-          Facundo — al frente de la tijera
+          Cristian — al frente de la tijera
         </h3>
         <p className="m-0 max-w-[56ch] text-[0.95rem] text-tinta-suave dark:text-navy-soft">
           Ocho años cortando en el barrio. Sabe exactamente qué fade te queda y qué no, y no te va a dejar

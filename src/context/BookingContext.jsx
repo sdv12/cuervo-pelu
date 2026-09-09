@@ -15,7 +15,8 @@ const initialState = {
   loadingHorarios: false,
   cuposRestantes: null, // null = calculando
   saving: false,
-  confirmado: null, // { whatsappUrl, icsUrl } tras confirmar
+  cancelando: false,
+  confirmado: null, // { nombre, telefono, whatsappUrl, cancelado } tras confirmar
 }
 
 function reducer(state, action) {
@@ -37,6 +38,10 @@ function reducer(state, action) {
       return { ...state, saving: true }
     case 'SAVE_DONE':
       return { ...state, saving: false, confirmado: action.confirmado }
+    case 'CANCEL_START':
+      return { ...state, cancelando: true }
+    case 'CANCEL_DONE':
+      return { ...state, cancelando: false, confirmado: { ...state.confirmado, cancelado: true } }
     case 'RESET':
       return { ...initialState, cuposRestantes: state.cuposRestantes }
     default:
@@ -47,7 +52,7 @@ function reducer(state, action) {
 // Los mismos días hábiles se calculan una sola vez por carga de página,
 // y sembramos un par de turnos de ejemplo (ver bookingService) para poder
 // probar el bloqueo de horarios sin backend todavía.
-const diasHabiles = getProximosDiasHabiles(6)
+const diasHabiles = getProximosDiasHabiles(7)
 sembrarTurnoDemo(diasHabiles[0]?.label, '11:00')
 sembrarTurnoDemo(diasHabiles[1]?.label, '17:30')
 
@@ -84,12 +89,21 @@ export function BookingProvider({ children }) {
     actualizarCupos()
   }, [state.day, state.time, state.service, state.price, actualizarCupos])
 
+  const cancelarTurno = useCallback(async () => {
+    dispatch({ type: 'CANCEL_START' })
+    await bookingService.cancelarTurno({
+      fecha: state.day, hora: state.time, telefono: state.confirmado?.telefono,
+    })
+    dispatch({ type: 'CANCEL_DONE' })
+    actualizarCupos()
+  }, [state.day, state.time, state.confirmado, actualizarCupos])
+
   const reiniciar = useCallback(() => dispatch({ type: 'RESET' }), [])
 
   const value = {
     state, diasHabiles,
     seleccionarServicio, irAPaso, seleccionarDia, seleccionarHora,
-    actualizarCupos, confirmarTurno, reiniciar,
+    actualizarCupos, confirmarTurno, cancelarTurno, reiniciar,
   }
 
   return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
