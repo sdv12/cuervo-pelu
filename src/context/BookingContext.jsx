@@ -48,8 +48,8 @@ function reducer(state, action) {
 // y sembramos un par de turnos de ejemplo (ver bookingService) para poder
 // probar el bloqueo de horarios sin backend todavía.
 const diasHabiles = getProximosDiasHabiles(6)
-sembrarTurnoDemo(diasHabiles[0]?.label, '11:20')
-sembrarTurnoDemo(diasHabiles[1]?.label, '16:20')
+sembrarTurnoDemo(diasHabiles[0]?.label, '11:00')
+sembrarTurnoDemo(diasHabiles[1]?.label, '17:30')
 
 export function BookingProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState)

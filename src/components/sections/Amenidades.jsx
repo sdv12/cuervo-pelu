@@ -11,7 +11,7 @@ export default function Amenidades() {
           <div className="mb-2.5 text-[0.9rem] font-semibold text-rojo">Más que un corte</div>
           <h2 className="text-[clamp(1.7rem,7vw,2.5rem)] uppercase text-hueso">Mientras esperás, disfrutá</h2>
           <p className="mt-2.5 text-[#C7CEDB]">
-            En Cuervo no solo te cortás el pelo — te quedás un rato. Todo esto va incluido en tu visita.
+            En Cuervo no solo te cortás el pelo — te quedás un rato. Jugás gratis, y si tenés hambre o sed, te lo servimos.
           </p>
         </div>
 
@@ -21,8 +21,13 @@ export default function Amenidades() {
             return (
               <div
                 key={a.id}
-                className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center transition-colors hover:border-rojo/50 hover:bg-white/[0.07] sm:p-6"
+                className="relative rounded-2xl border border-white/10 bg-white/5 p-5 text-center transition-colors hover:border-rojo/50 hover:bg-white/[0.07] sm:p-6"
               >
+                {a.gratis && (
+                  <span className="absolute right-3 top-3 rounded-full bg-rojo px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                    Gratis
+                  </span>
+                )}
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rojo/15 text-rojo sm:h-14 sm:w-14">
                   <Icono size={26} />
                 </div>

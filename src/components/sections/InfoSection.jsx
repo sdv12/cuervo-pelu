@@ -1,5 +1,5 @@
-import { MessageCircle } from 'lucide-react'
-import { WHATSAPP_NUMBER } from '../../config/contact'
+import { MessageCircle, Instagram } from 'lucide-react'
+import { WHATSAPP_NUMBER, INSTAGRAM_URL } from '../../config/contact'
 
 export default function InfoSection() {
   return (
@@ -8,10 +8,10 @@ export default function InfoSection() {
         <div>
           <h3 className="mb-3.5 text-[1.1rem] uppercase text-azul dark:text-navy-text">Horarios</h3>
           <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
-            <span className="text-tinta-suave dark:text-navy-soft">Martes a viernes</span><span>10:00 — 20:00</span>
+            <span className="text-tinta-suave dark:text-navy-soft">Martes a viernes</span><span>10:00–13:00 y 17:00–20:00</span>
           </div>
           <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
-            <span className="text-tinta-suave dark:text-navy-soft">Sábados</span><span>9:00 — 18:00</span>
+            <span className="text-tinta-suave dark:text-navy-soft">Sábados</span><span>9:00 — 20:00</span>
           </div>
           <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
             <span className="text-tinta-suave dark:text-navy-soft">Domingos y lunes</span><span>Cerrado</span>
@@ -25,14 +25,24 @@ export default function InfoSection() {
           <p className="text-tinta-suave dark:text-navy-soft">
             ¿Preferís preguntar antes de reservar? Escribinos directo por WhatsApp o seguinos en Instagram.
           </p>
-          <a
-            className="mt-3 inline-flex items-center gap-2 text-[0.95rem] font-semibold text-rojo no-underline dark:text-navy-accent"
-            target="_blank" rel="noopener"
-            href={`https://wa.me/${WHATSAPP_NUMBER}`}
-          >
-            <MessageCircle size={16} />
-            Escribir por WhatsApp
-          </a>
+          <div className="mt-3 flex flex-col gap-2.5">
+            <a
+              className="inline-flex items-center gap-2 text-[0.95rem] font-semibold text-rojo no-underline dark:text-navy-accent"
+              target="_blank" rel="noopener"
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            >
+              <MessageCircle size={16} />
+              Escribir por WhatsApp
+            </a>
+            <a
+              className="inline-flex items-center gap-2 text-[0.95rem] font-semibold text-rojo no-underline dark:text-navy-accent"
+              target="_blank" rel="noopener"
+              href={INSTAGRAM_URL}
+            >
+              <Instagram size={16} />
+              @elcuervopeluqueria
+            </a>
+          </div>
         </div>
       </div>
     </section>
