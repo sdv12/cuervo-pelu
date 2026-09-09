@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply font-sans antialiased bg-hueso text-tinta transition-colors duration-300;
+  }
+  body.dark {
+    @apply bg-navy text-navy-text;
+  }
+  h1, h2, h3 {
+    @apply font-display m-0 tracking-wide;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-md font-semibold text-[0.98rem]
+           transition-transform duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-rojo text-white hover:bg-rojo-2;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-azul border-[1.5px] border-azul hover:bg-azul hover:text-white
+           dark:text-navy-text dark:border-navy-border dark:hover:bg-azul-2 dark:hover:text-white;
+  }
+  .btn-small {
+    @apply px-5 py-2.5 text-sm;
+  }
+
+  /* Franja diagonal — el único quiebre estructural entre el hero y el resto */
+  .stripe {
+    height: 26px;
+    background: repeating-linear-gradient(-35deg, #12233F 0 34px, #A32638 34px 68px);
+  }
+
+  /* Ticket-stub del widget de turnos */
+  .ticket-notch {
+    @apply absolute w-7 h-7 rounded-full bg-azul dark:bg-navy top-1/2 -translate-y-1/2 hidden sm:block;
+  }
+
+  .loading-note {
+    @apply text-sm italic text-tinta-suave dark:text-navy-soft mt-2.5;
+  }
+}

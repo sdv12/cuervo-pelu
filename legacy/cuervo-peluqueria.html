@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuervo Peluquería — Turnos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#12233F;
+    --azul-2:#1B3157;
+    --rojo:#A32638;
+    --rojo-2:#8A1F2E;
+    --hueso:#EFEBE2;
+    --panel:#E4DFD1;
+    --tinta:#201D1A;
+    --tinta-suave:#4A453E;
+    --dorado:#B9925A;
+    --linea:#CFC8B8;
+    --radius-ticket: 18px;
+    --max: 1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--hueso);
+    color:var(--tinta);
+    font-family:'Work Sans', sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Oswald', sans-serif;
+    margin:0;
+    color:var(--azul);
+    letter-spacing:0.01em;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;}
+  :focus-visible{outline:3px solid var(--dorado); outline-offset:2px;}
+
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(239,235,226,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--linea);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 24px;
+    max-width:var(--max); margin:0 auto;
+  }
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+  .brand svg{width:30px; height:30px; flex-shrink:0;}
+  .brand span{
+    font-family:'Oswald', sans-serif; font-weight:600; font-size:1.15rem;
+    color:var(--azul); letter-spacing:0.02em;
+  }
+  .nav-links{display:flex; gap:28px; align-items:center;}
+  .nav-links a{
+    text-decoration:none; color:var(--tinta-suave); font-weight:500; font-size:0.95rem;
+    transition:color .15s ease;
+  }
+  .nav-links a:hover{color:var(--rojo);}
+  .nav-cta{
+    background:var(--rojo); color:#fff !important; padding:9px 18px;
+    border-radius:6px; font-weight:600; font-size:0.9rem;
+  }
+  .nav-cta:hover{background:var(--rojo-2);}
+  @media (max-width:640px){ .nav-links a:not(.nav-cta){display:none;} }
+
+  .theme-toggle{
+    background:none; border:1.5px solid var(--linea); border-radius:50%;
+    width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; margin-left:14px; flex-shrink:0;
+  }
+  .theme-toggle svg{width:17px; height:17px; color:var(--azul);}
+  .theme-toggle:hover{border-color:var(--rojo);}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:64px 0 40px;}
+  .hero-grid{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:center;
+  }
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr; gap:28px;} }
+
+  .kicker{
+    color:var(--rojo); font-weight:600; font-size:0.95rem; margin-bottom:10px;
+  }
+  .hero h1{
+    font-size:clamp(2.8rem, 6vw, 4.6rem);
+    line-height:0.98;
+    text-transform:uppercase;
+  }
+  .hero h1 em{
+    font-style:normal; color:var(--rojo);
+  }
+  .hero p.lead{
+    margin-top:18px; max-width:46ch; font-size:1.08rem; color:var(--tinta-suave);
+  }
+  .hero-actions{display:flex; gap:14px; margin-top:28px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:13px 24px; border-radius:6px; border:none; cursor:pointer;
+    font-weight:600; font-size:0.98rem; text-decoration:none; transition:transform .12s ease, background .15s ease;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn-primary{background:var(--rojo); color:#fff;}
+  .btn-primary:hover{background:var(--rojo-2);}
+  .btn-ghost{background:transparent; color:var(--azul); border:1.5px solid var(--azul);}
+  .btn-ghost:hover{background:var(--azul); color:#fff;}
+
+  .hero-meta{
+    margin-top:26px; display:flex; gap:22px; flex-wrap:wrap;
+    font-size:0.9rem; color:var(--tinta-suave);
+  }
+  .hero-meta span{display:flex; align-items:center; gap:7px;}
+  .hero-meta svg{width:16px; height:16px; color:var(--rojo);}
+
+  .hero-art{
+    position:relative; display:flex; justify-content:center; align-items:center;
+  }
+  .hero-art svg{width:100%; max-width:360px; height:auto;}
+
+  /* ---------- STRIPE DIVIDER (unique structural moment) ---------- */
+  .stripe{
+    height:26px;
+    background:repeating-linear-gradient(
+      -35deg,
+      var(--azul) 0 34px,
+      var(--rojo) 34px 68px
+    );
+    margin:0 0 0 0;
+  }
+
+  /* ---------- SECTION HEADINGS ---------- */
+  .section{padding:72px 0;}
+  .section-head{margin-bottom:34px; max-width:56ch;}
+  .section-head h2{font-size:clamp(1.9rem, 3.4vw, 2.5rem); text-transform:uppercase;}
+  .section-head p{color:var(--tinta-suave); margin-top:10px;}
+
+  /* ---------- WHY US (lineup-style row, not identical cards) ---------- */
+  .why-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:0;
+    border-top:1px solid var(--linea); border-bottom:1px solid var(--linea);
+  }
+  .why-item{padding:26px 28px;}
+  .why-item + .why-item{border-left:1px solid var(--linea);}
+  .why-item h3{font-size:1.05rem; text-transform:uppercase; margin-bottom:8px; color:var(--rojo);}
+  .why-item p{color:var(--tinta-suave); font-size:0.95rem; margin:0;}
+  @media (max-width:760px){
+    .why-grid{grid-template-columns:1fr;}
+    .why-item + .why-item{border-left:none; border-top:1px solid var(--linea);}
+  }
+
+  /* ---------- GALLERY (horizontal strip, reuses the day-scroll pattern) ---------- */
+  .gallery-note{font-size:0.85rem; color:var(--tinta-suave); font-style:italic; margin-top:-18px; margin-bottom:26px;}
+  .style-scroll{display:flex; gap:14px; overflow-x:auto; padding-bottom:10px;}
+  .style-tile{
+    flex:0 0 auto; width:190px; background:var(--panel); border-radius:10px;
+    padding:18px; border:1px solid var(--linea);
+  }
+  .style-tile svg{width:100%; height:70px;}
+  .style-tile h3{font-size:0.98rem; margin-top:10px; text-transform:none;}
+  .style-tile span{font-size:0.82rem; color:var(--tinta-suave);}
+
+  /* ---------- BARBER PROFILE ---------- */
+  .barbero{
+    display:flex; gap:24px; align-items:flex-start; margin-top:44px;
+    padding-top:36px; border-top:1px solid var(--linea);
+  }
+  .barbero-avatar{
+    width:76px; height:76px; border-radius:50%; background:var(--azul); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .barbero-avatar svg{width:38px; height:38px;}
+  .barbero-info h3{font-size:1.1rem; text-transform:none; margin-bottom:6px;}
+  .barbero-info p{color:var(--tinta-suave); font-size:0.95rem; max-width:56ch; margin:0;}
+  .barbero-tag{
+    display:inline-block; margin-top:10px; font-size:0.8rem; font-weight:600;
+    color:var(--rojo); border:1px solid var(--rojo); border-radius:20px; padding:3px 12px;
+  }
+  @media (max-width:560px){ .barbero{flex-direction:column;} }
+
+  /* ---------- TESTIMONIOS ---------- */
+  .testimonios{background:var(--panel);}
+  .quote-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:1px solid var(--linea); border-bottom:1px solid var(--linea);}
+  .quote-card{padding:24px 26px;}
+  .quote-card + .quote-card{border-left:1px solid var(--linea);}
+  .quote-card p{font-size:0.98rem; margin:0 0 12px;}
+  .quote-cite{font-size:0.85rem; color:var(--tinta-suave); font-weight:600;}
+  @media (max-width:760px){
+    .quote-grid{grid-template-columns:1fr;}
+    .quote-card + .quote-card{border-left:none; border-top:1px solid var(--linea);}
+  }
+
+  /* ---------- SERVICES (program-sheet list, not identical cards) ---------- */
+  .servicios{background:var(--panel);}
+  .service-list{border-top:1px solid var(--linea);}
+  .service-row{
+    display:flex; align-items:baseline; gap:16px;
+    padding:20px 0; border-bottom:1px solid var(--linea);
+  }
+  .service-row .name{font-family:'Oswald', sans-serif; font-weight:500; font-size:1.15rem; color:var(--azul); white-space:nowrap;}
+  .service-row .fill{
+    flex:1; border-bottom:2px dotted var(--tinta-suave); opacity:0.4; margin-bottom:6px;
+    min-width:24px;
+  }
+  .service-row .price{font-weight:600; font-size:1.05rem; white-space:nowrap;}
+  .service-row .note{
+    display:block; font-size:0.85rem; color:var(--tinta-suave); margin-top:2px; font-weight:400;
+  }
+  .service-row.featured .name{color:var(--rojo);}
+
+  /* ---------- TURNOS: ticket-stub booking widget ---------- */
+  .turnos{background:var(--azul); color:var(--hueso);}
+  .turnos .section-head h2{color:var(--hueso);}
+  .turnos .section-head p{color:#C7CEDB;}
+
+  .ticket{
+    background:var(--hueso); color:var(--tinta);
+    border-radius:var(--radius-ticket);
+    position:relative;
+    display:grid; grid-template-columns:1fr;
+    box-shadow:0 18px 40px rgba(0,0,0,0.28);
+    overflow:visible;
+  }
+  .ticket-notch{
+    position:absolute; width:28px; height:28px; background:var(--azul);
+    border-radius:50%; top:50%; transform:translateY(-50%);
+  }
+  .ticket-notch.left{left:-14px;}
+  .ticket-notch.right{right:-14px;}
+  @media (max-width:760px){
+    .ticket-notch{display:none;}
+  }
+
+  .steps-bar{
+    display:flex; border-bottom:1.5px dashed var(--linea);
+    padding:22px 28px 18px;
+    gap:6px; flex-wrap:wrap;
+  }
+  .step-pill{
+    display:flex; align-items:center; gap:8px;
+    font-size:0.85rem; font-weight:600; color:var(--tinta-suave);
+    padding:6px 12px; border-radius:20px; border:1.5px solid var(--linea);
+  }
+  .step-pill.active{border-color:var(--rojo); color:var(--rojo); background:rgba(163,38,56,0.06);}
+  .step-pill .num{
+    width:18px; height:18px; border-radius:50%; background:var(--linea);
+    color:#fff; font-size:0.72rem; display:flex; align-items:center; justify-content:center;
+  }
+  .step-pill.active .num{background:var(--rojo);}
+
+  .step-body{padding:28px;}
+  .step-panel{display:none;}
+  .step-panel.visible{display:block; animation:fade .25s ease;}
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .step-panel h3{font-size:1.2rem; margin-bottom:16px; text-transform:uppercase;}
+
+  .choice-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:10px;}
+  .choice{
+    border:1.5px solid var(--linea); border-radius:8px; padding:12px 14px;
+    cursor:pointer; background:#fff; text-align:left; transition:border-color .15s ease, background .15s ease;
+  }
+  .choice strong{display:block; font-size:0.95rem; color:var(--azul);}
+  .choice span{font-size:0.82rem; color:var(--tinta-suave);}
+  .choice:hover{border-color:var(--rojo);}
+  .choice.selected{border-color:var(--rojo); background:rgba(163,38,56,0.06);}
+
+  .day-scroll{display:flex; gap:10px; overflow-x:auto; padding-bottom:6px;}
+  .day-chip{
+    flex:0 0 auto; border:1.5px solid var(--linea); border-radius:10px;
+    padding:10px 14px; text-align:center; cursor:pointer; background:#fff; min-width:64px;
+  }
+  .day-chip .d{font-size:0.72rem; text-transform:uppercase; color:var(--tinta-suave); display:block;}
+  .day-chip .n{font-family:'Oswald'; font-size:1.1rem; color:var(--azul); display:block;}
+  .day-chip.selected{border-color:var(--rojo); background:rgba(163,38,56,0.06);}
+  .day-chip.selected .n{color:var(--rojo);}
+
+  .time-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(78px,1fr)); gap:8px; margin-top:14px;}
+  .time-chip{
+    border:1.5px solid var(--linea); border-radius:8px; padding:9px 0; text-align:center;
+    cursor:pointer; background:#fff; font-size:0.9rem;
+  }
+  .time-chip.selected{border-color:var(--rojo); background:rgba(163,38,56,0.06); color:var(--rojo); font-weight:600;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px; color:var(--tinta-suave);}
+  .field input{
+    width:100%; padding:11px 14px; border-radius:8px; border:1.5px solid var(--linea);
+    font-size:0.98rem; font-family:inherit; background:#fff;
+  }
+  .field input:focus{border-color:var(--rojo);}
+
+  .step-nav{display:flex; justify-content:space-between; margin-top:22px; gap:12px;}
+  .btn-small{padding:10px 20px; font-size:0.9rem;}
+  .summary-line{
+    font-size:0.88rem; color:var(--tinta-suave); margin-top:16px; padding-top:16px;
+    border-top:1px dashed var(--linea);
+  }
+  .summary-line strong{color:var(--azul);}
+
+  .cupos-note{
+    display:inline-flex; align-items:center; gap:8px; font-size:0.85rem;
+    color:#C7CEDB; margin-top:14px; font-weight:500;
+  }
+  .cupos-note .dot{width:7px; height:7px; border-radius:50%; background:var(--rojo);}
+
+  .time-chip.ocupado{
+    opacity:0.35; cursor:not-allowed; text-decoration:line-through;
+  }
+  .time-chip.ocupado:hover{border-color:var(--linea);}
+
+  .calendar-link{
+    display:inline-flex; align-items:center; gap:6px; margin-top:14px;
+    font-size:0.88rem; font-weight:600; color:var(--azul); text-decoration:none;
+  }
+  .calendar-link:hover{color:var(--rojo);}
+
+  /* ---------- FIDELIDAD (tarjeta sellada, mismo lenguaje visual que el ticket) ---------- */
+  .fidelidad-card{
+    background:var(--panel); border-radius:14px; border:1.5px dashed var(--linea);
+    padding:28px 30px; display:flex; align-items:center; gap:28px; flex-wrap:wrap;
+  }
+  .fidelidad-text{flex:1; min-width:220px;}
+  .fidelidad-text h3{font-size:1.15rem; margin-bottom:8px; text-transform:uppercase;}
+  .fidelidad-text p{color:var(--tinta-suave); margin:0; font-size:0.95rem; max-width:48ch;}
+  .fidelidad-slots{display:flex; gap:10px;}
+  .fidelidad-slot{
+    width:42px; height:42px; border-radius:50%; border:1.5px dashed var(--linea);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .fidelidad-slot.sellado{border-style:solid; border-color:var(--rojo); background:rgba(163,38,56,0.06);}
+  .fidelidad-slot svg{width:20px; height:20px;}
+
+  .fidelidad-lookup{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;}
+  .fidelidad-lookup input{
+    flex:1; min-width:160px; padding:9px 12px; border-radius:8px; border:1.5px solid var(--linea);
+    font-family:inherit; font-size:0.9rem; background:#fff;
+  }
+  .fidelidad-lookup input:focus{border-color:var(--rojo);}
+
+  .btn:disabled{opacity:0.6; cursor:not-allowed;}
+
+  .loading-note{font-size:0.85rem; color:var(--tinta-suave); font-style:italic; margin-top:10px;}
+
+  /* ---------- INFO / HOURS+LOCATION ---------- */
+  .info{padding:70px 0;}
+  .info-grid{display:grid; grid-template-columns:1fr 1fr; gap:40px;}
+  @media (max-width:760px){ .info-grid{grid-template-columns:1fr;} }
+  .info-card h3{font-size:1.1rem; text-transform:uppercase; margin-bottom:14px;}
+  .hours-row{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--linea); font-size:0.95rem;}
+  .hours-row span:first-child{color:var(--tinta-suave);}
+  .joke{margin-top:14px; font-size:0.85rem; color:var(--tinta-suave); font-style:italic;}
+
+  .map-link{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px;
+    color:var(--rojo); font-weight:600; text-decoration:none; font-size:0.95rem;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--azul); color:#C7CEDB; padding:36px 0;}
+  .footer-inner{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
+  .footer-brand{display:flex; align-items:center; gap:10px;}
+  .footer-brand svg{width:22px; height:22px;}
+  .footer-brand span{font-family:'Oswald'; color:#fff; font-weight:600;}
+  .footer-links{display:flex; gap:20px; font-size:0.88rem;}
+  .footer-links a{text-decoration:none; color:#C7CEDB;}
+  .footer-links a:hover{color:#fff;}
+
+  /* ---------- MODO NOCHE ---------- */
+  body.dark{background:#0E1830; color:#ECE7DA;}
+  body.dark .nav{background:rgba(14,24,48,0.92); border-color:#26314C;}
+  body.dark .brand span{color:#ECE7DA;}
+  body.dark .nav-links a{color:#AEB6C7;}
+  body.dark .theme-toggle{border-color:#2B3958;}
+  body.dark .theme-toggle svg{color:#ECE7DA;}
+  body.dark h1, body.dark h2, body.dark h3{color:#F4EFE3;}
+  body.dark .hero p.lead,
+  body.dark .section-head p,
+  body.dark .why-item p,
+  body.dark .info-card p,
+  body.dark .hours-row span:first-child,
+  body.dark .gallery-note,
+  body.dark .barbero-info p,
+  body.dark .quote-cite,
+  body.dark .fidelidad-text p,
+  body.dark .step-pill,
+  body.dark .loading-note,
+  body.dark .service-row .note{color:#AEB6C7;}
+  body.dark .why-grid,
+  body.dark .service-list,
+  body.dark .service-row,
+  body.dark .hours-row,
+  body.dark .quote-grid,
+  body.dark .quote-card,
+  body.dark .why-item + .why-item,
+  body.dark .steps-bar,
+  body.dark .summary-line{border-color:#26314C;}
+  body.dark .servicios,
+  body.dark .testimonios,
+  body.dark .info{background:#0E1830;}
+  body.dark .service-row .price{color:#ECE7DA;}
+  body.dark .service-row .fill{border-color:#AEB6C7;}
+  body.dark .style-tile,
+  body.dark .choice,
+  body.dark .day-chip,
+  body.dark .time-chip,
+  body.dark .field input,
+  body.dark .fidelidad-lookup input,
+  body.dark .fidelidad-card{
+    background:#16213D; border-color:#2B3958; color:#ECE7DA;
+  }
+  body.dark .choice strong, body.dark .day-chip .n{color:#F4EFE3;}
+  body.dark .ticket{background:#16213D; color:#ECE7DA;}
+  body.dark .ticket-notch{background:#0E1830;}
+  body.dark .fidelidad-slot{border-color:#2B3958;}
+  body.dark .fidelidad-slot.sellado{background:rgba(163,38,56,0.15);}
+  body.dark .map-link, body.dark .calendar-link{color:#E7A2AC;}
+  body.dark .btn-ghost{color:#ECE7DA; border-color:#4A5C82;}
+  body.dark .btn-ghost:hover{background:#1B3157; color:#fff;}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M8 40c4-10 12-18 24-18 3 0 5 1 7-2 1-2 3-6 6-7-1 3-1 6 1 8 4 1 8 3 9 8-3-1-6-1-8 1 3 3 4 8 2 13-3-4-7-6-11-6-9 0-16 5-19 12-2-4-2-7-1-11-4 1-7 1-10-1 3-1 5-3 6-6-2 1-4 1-6 0-1-2 0-3 0-3z" fill="#12233F"/>
+        <circle cx="41" cy="26" r="1.6" fill="#EFEBE2"/>
+      </svg>
+      <span>Cuervo Peluquería</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#por-que">Por qué nosotros</a>
+      <a href="#turnos" class="nav-cta">Reservar turno</a>
+    </nav>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar a modo noche">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker">Barrio de siempre, corte de siempre</div>
+        <h1>Cuervo<br><em>Peluquería</em></h1>
+        <p class="lead">Atención detallista, precios de barrio y técnicas al día. Elegís el corte, el día y la hora, y confirmás por WhatsApp en dos minutos.</p>
+        <div class="hero-actions">
+          <a href="#turnos" class="btn btn-primary">Reservar turno</a>
+          <a href="#servicios" class="btn btn-ghost">Ver servicios y precios</a>
+        </div>
+        <div class="hero-meta">
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            Mar. a sáb. · 10 a 20 hs
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20l1.7-4.6A8 8 0 1 1 8 18.6L3 20z"/></svg>
+            Turnos por WhatsApp
+          </span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="150" cy="150" r="148" fill="none" stroke="#12233F" stroke-width="1" opacity="0.15"/>
+          <path d="M60 190c15-45 55-85 105-85 15 0 22 6 30-8 6-10 14-26 28-32-4 12-4 26 4 34 18 6 34 16 38 36-14-6-28-4-36 6 12 14 16 34 6 54-12-16-30-24-48-24-40 0-70 22-84 52-8-16-8-30-2-46-18 6-32 4-44-4 12-6 22-14 26-26-10 4-18 2-27-2-4-8 4-5 4-5z"
+                fill="var(--azul)"/>
+          <path d="M60 190c15-45 55-85 105-85 15 0 22 6 30-8 6-10 14-26 28-32-4 12-4 26 4 34"
+                fill="none" stroke="var(--rojo)" stroke-width="3" opacity="0.6"/>
+          <circle cx="186" cy="119" r="6" fill="#EFEBE2"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="stripe" role="presentation"></div>
+
+  <section class="section why" id="por-que">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Por qué nosotros</h2>
+        <p>No competimos por ser los más grandes del barrio, sino por ser los que mejor te atienden.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-item">
+          <h3>Atención detallista</h3>
+          <p>Cada corte se piensa para la cara y el pelo de la persona que se sienta en la silla, no en serie.</p>
+        </div>
+        <div class="why-item">
+          <h3>Precios de barrio</h3>
+          <p>Tarifas pensadas para que venir cada tres semanas no sea un lujo.</p>
+        </div>
+        <div class="why-item">
+          <h3>Técnicas al día</h3>
+          <p>Fade, diseño y degradé actualizados, sin perder el corte clásico de toda la vida.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section gallery" id="estilos">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Estilos que hacemos</h2>
+        <p>Una muestra de lo que sale de la silla — reemplazá los íconos por fotos reales de tus cortes apenas puedas.</p>
+      </div>
+      <p class="gallery-note">Ilustraciones de referencia, no fotos.</p>
+      <div class="style-scroll">
+        <div class="style-tile">
+          <svg viewBox="0 0 100 70" fill="none" stroke="#12233F" stroke-width="2"><path d="M30 55c5-25 15-38 20-38s15 13 20 38"/><path d="M25 55h50"/></svg>
+          <h3>El clásico</h3>
+          <span>Prolijo, de siempre</span>
+        </div>
+        <div class="style-tile">
+          <svg viewBox="0 0 100 70" fill="none" stroke="#A32638" stroke-width="2"><path d="M30 55c3-20 10-35 20-35s17 15 20 35"/><path d="M32 40h36" stroke-dasharray="3 3"/></svg>
+          <h3>Fade texturizado</h3>
+          <span>Degradé marcado</span>
+        </div>
+        <div class="style-tile">
+          <svg viewBox="0 0 100 70" fill="none" stroke="#12233F" stroke-width="2"><path d="M30 55c3-22 12-36 20-36s17 14 20 36"/><path d="M40 30l5 10-5 8" stroke="#A32638"/></svg>
+          <h3>Diseño con línea</h3>
+          <span>A pedido</span>
+        </div>
+        <div class="style-tile">
+          <svg viewBox="0 0 100 70" fill="none" stroke="#12233F" stroke-width="2"><path d="M35 50c0-15 6-26 15-26s15 11 15 26"/></svg>
+          <h3>Corte niño</h3>
+          <span>Rápido y prolijo</span>
+        </div>
+        <div class="style-tile">
+          <svg viewBox="0 0 100 70" fill="none" stroke="#12233F" stroke-width="2"><path d="M25 50c8-12 42-12 50 0" /><path d="M30 50c2 8 8 13 20 13s18-5 20-13"/></svg>
+          <h3>Barba tallada</h3>
+          <span>Perfilado a navaja</span>
+        </div>
+      </div>
+
+      <div class="barbero">
+        <div class="barbero-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#EFEBE2" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        </div>
+        <div class="barbero-info">
+          <h3>Facundo — al frente de la tijera</h3>
+          <p>Ocho años cortando en el barrio. Sabe exactamente qué fade te queda y qué no, y no te va a dejar salir con un corte que no te guste.</p>
+          <span class="barbero-tag">Hincha del Ciclón, se nota en la charla</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section servicios" id="servicios">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Servicios</h2>
+        <p>Precios de referencia — ajustalos cuando quieras desde el código.</p>
+      </div>
+      <div class="service-list">
+        <div class="service-row featured">
+          <span class="name">Corte clásico</span>
+          <span class="fill"></span>
+          <span class="price">$6.000</span>
+        </div>
+        <div class="service-row">
+          <span class="name">Corte + barba</span>
+          <span class="fill"></span>
+          <span class="price">$8.500</span>
+        </div>
+        <div class="service-row">
+          <span class="name">Barba y perfilado</span>
+          <span class="fill"></span>
+          <span class="price">$4.000</span>
+        </div>
+        <div class="service-row">
+          <span class="name">Diseño / fade
+            <span class="note">Incluye línea y dibujo a pedido</span>
+          </span>
+          <span class="fill"></span>
+          <span class="price">$7.500</span>
+        </div>
+        <div class="service-row">
+          <span class="name">Corte niños</span>
+          <span class="fill"></span>
+          <span class="price">$5.000</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section testimonios">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Lo que dicen los clientes</h2>
+        <p>Ejemplos de comentarios — cambialos por reseñas reales apenas las tengas.</p>
+      </div>
+      <div class="quote-grid">
+        <div class="quote-card">
+          <p>"Voy cada tres semanas y siempre sale como quiero. Nunca tuve que corregir nada."</p>
+          <span class="quote-cite">— Martín, cliente</span>
+        </div>
+        <div class="quote-card">
+          <p>"El fade quedó perfecto y el precio no tiene nada que envidiarle a las peluquerías del centro."</p>
+          <span class="quote-cite">— Iván, cliente</span>
+        </div>
+        <div class="quote-card">
+          <p>"Te atienden por tu nombre, se acuerdan cómo te gusta el corte. Eso no se encuentra en cualquier lado."</p>
+          <span class="quote-cite">— Rodrigo, cliente</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section turnos" id="turnos">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Reservá tu turno</h2>
+        <p>Cuatro pasos y listo — al final te llevamos a WhatsApp con todo ya escrito.</p>
+        <div class="cupos-note" id="cuposNote"><span class="dot"></span> <span id="cuposTexto">Quedan algunos turnos esta semana</span></div>
+      </div>
+
+      <div class="ticket">
+        <span class="ticket-notch left"></span>
+        <span class="ticket-notch right"></span>
+
+        <div class="steps-bar" id="stepsBar">
+          <div class="step-pill active" data-step="1"><span class="num">1</span> Servicio</div>
+          <div class="step-pill" data-step="2"><span class="num">2</span> Día</div>
+          <div class="step-pill" data-step="3"><span class="num">3</span> Hora</div>
+          <div class="step-pill" data-step="4"><span class="num">4</span> Tus datos</div>
+        </div>
+
+        <div class="step-body">
+
+          <div class="step-panel visible" data-panel="1">
+            <h3>Elegí el servicio</h3>
+            <div class="choice-grid" id="serviceChoices">
+              <button type="button" class="choice" data-service="Corte clásico" data-price="$6.000">
+                <strong>Corte clásico</strong><span>$6.000</span>
+              </button>
+              <button type="button" class="choice" data-service="Corte + barba" data-price="$8.500">
+                <strong>Corte + barba</strong><span>$8.500</span>
+              </button>
+              <button type="button" class="choice" data-service="Barba y perfilado" data-price="$4.000">
+                <strong>Barba y perfilado</strong><span>$4.000</span>
+              </button>
+              <button type="button" class="choice" data-service="Diseño / fade" data-price="$7.500">
+                <strong>Diseño / fade</strong><span>$7.500</span>
+              </button>
+              <button type="button" class="choice" data-service="Corte niños" data-price="$5.000">
+                <strong>Corte niños</strong><span>$5.000</span>
+              </button>
+            </div>
+            <div class="step-nav">
+              <span></span>
+              <button type="button" class="btn btn-primary btn-small" id="toStep2" disabled>Continuar</button>
+            </div>
+          </div>
+
+          <div class="step-panel" data-panel="2">
+            <h3>Elegí el día</h3>
+            <div class="day-scroll" id="dayChoices"></div>
+            <p class="loading-note" id="horariosStatus" style="display:none;"></p>
+            <div class="step-nav">
+              <button type="button" class="btn btn-ghost btn-small" data-back="1">Atrás</button>
+              <button type="button" class="btn btn-primary btn-small" id="toStep3" disabled>Continuar</button>
+            </div>
+          </div>
+
+          <div class="step-panel" data-panel="3">
+            <h3>Elegí el horario</h3>
+            <div class="time-grid" id="timeChoices"></div>
+            <div class="step-nav">
+              <button type="button" class="btn btn-ghost btn-small" data-back="2">Atrás</button>
+              <button type="button" class="btn btn-primary btn-small" id="toStep4" disabled>Continuar</button>
+            </div>
+          </div>
+
+          <div class="step-panel" data-panel="4">
+            <h3>Tus datos</h3>
+            <div class="field">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" placeholder="¿Cómo te llamás?">
+            </div>
+            <div class="field">
+              <label for="telefono">Tu teléfono</label>
+              <input type="tel" id="telefono" placeholder="Lo usamos para tu tarjeta de fidelidad y para avisarte si hay algún cambio">
+            </div>
+            <div class="summary-line" id="summaryLine"></div>
+            <div class="step-nav">
+              <button type="button" class="btn btn-ghost btn-small" data-back="3">Atrás</button>
+              <button type="button" class="btn btn-primary" id="confirmarBtn">Confirmar por WhatsApp</button>
+            </div>
+            <a href="#" class="calendar-link" id="calendarLink" style="display:none;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+              Agregar a mi calendario
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Tarjeta de fidelidad</h2>
+        <p>Cada 5 cortes, el sexto va con 20% off. Por ahora la llevamos a mano en el local — contanos cuántos cortes ya te hiciste y te los anotamos.</p>
+      </div>
+      <div class="fidelidad-card">
+        <div class="fidelidad-slots" id="fidelidadSlots" aria-hidden="true">
+          <div class="fidelidad-slot"></div>
+          <div class="fidelidad-slot"></div>
+          <div class="fidelidad-slot"></div>
+          <div class="fidelidad-slot"></div>
+          <div class="fidelidad-slot"></div>
+        </div>
+        <div class="fidelidad-text">
+          <h3 id="fidelidadTitulo">Consultá tu tarjeta</h3>
+          <p id="fidelidadMsg">Ingresá el teléfono con el que reservás para ver cuántos cortes llevás.</p>
+          <div class="fidelidad-lookup">
+            <input type="tel" id="fidelidadTelefono" placeholder="Tu teléfono">
+            <button type="button" class="btn btn-ghost btn-small" id="fidelidadBtn">Ver mi tarjeta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="info">
+    <div class="wrap info-grid">
+      <div class="info-card">
+        <h3>Horarios</h3>
+        <div class="hours-row"><span>Martes a viernes</span><span>10:00 — 20:00</span></div>
+        <div class="hours-row"><span>Sábados</span><span>9:00 — 18:00</span></div>
+        <div class="hours-row"><span>Domingos y lunes</span><span>Cerrado</span></div>
+        <p class="joke">Y cerrado también los días que el Ciclón juega de local, obvio.</p>
+      </div>
+      <div class="info-card">
+        <h3>Contacto directo</h3>
+        <p>¿Preferís preguntar antes de reservar? Escribinos directo por WhatsApp o seguinos en Instagram.</p>
+        <a class="map-link" target="_blank" rel="noopener" href="https://wa.me/5491100000000">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20l1.7-4.6A8 8 0 1 1 8 18.6L3 20z"/></svg>
+          Escribir por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M8 40c4-10 12-18 24-18 3 0 5 1 7-2 1-2 3-6 6-7-1 3-1 6 1 8 4 1 8 3 9 8-3-1-6-1-8 1 3 3 4 8 2 13-3-4-7-6-11-6-9 0-16 5-19 12-2-4-2-7-1-11-4 1-7 1-10-1 3-1 5-3 6-6-2 1-4 1-6 0-1-2 0-3 0-3z" fill="#EFEBE2"/>
+      </svg>
+      <span>Cuervo Peluquería</span>
+    </div>
+    <div class="footer-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#turnos">Turnos</a>
+      <a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ---- CONFIG: reemplazá estos valores por los reales del negocio ----
+  const WHATSAPP_NUMBER = "5491100000000"; // código país + área + número, sin + ni espacios
+  const CUPOS_PROMO_SEMANALES = 4; // techo semanal de turnos con descuento de bienvenida
+
+  const state = { service:null, price:null, day:null, dayDate:null, time:null, horariosOcupados:null };
+
+  // ---- Capa de datos ---------------------------------------------------
+  // Única puerta de entrada a turnos, cupos y clientes. Hoy lee/escribe en
+  // MOCK_DB (memoria del navegador, se pierde al recargar). Cuando se
+  // conecte Supabase, solo hace falta reescribir el cuerpo de estas cuatro
+  // funciones para que usen el cliente de Supabase — el resto del código
+  // (pasos del ticket, UI) no necesita cambiar.
+  const MOCK_DB = {
+    turnos: [],   // { fecha, hora, servicio, precio, nombre, telefono, estado }
+    clientes: {}  // telefono -> { nombre, cortes_count }
+  };
+  // Cliente de ejemplo para poder probar la tarjeta de fidelidad ya mismo.
+  MOCK_DB.clientes['5491111111111'] = { nombre: 'Cliente Demo', cortes_count: 2 };
+
+  const DataService = {
+    // TODO(supabase): select hora from turnos_publicos where fecha = fechaStr
+    getHorariosOcupados(fechaStr){
+      return new Promise(resolve=>{
+        setTimeout(()=>{
+          const ocupados = MOCK_DB.turnos
+            .filter(t => t.fecha === fechaStr && t.estado !== 'cancelado')
+            .map(t => t.hora);
+          resolve(ocupados);
+        }, 350);
+      });
+    },
+
+    // TODO(supabase): contar turnos (estado <> 'cancelado') con fecha dentro de la semana actual
+    getCuposRestantesSemana(){
+      return new Promise(resolve=>{
+        setTimeout(()=>{
+          const hoy = new Date();
+          const inicioSemana = new Date(hoy);
+          inicioSemana.setHours(0,0,0,0);
+          inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+          const finSemana = new Date(inicioSemana);
+          finSemana.setDate(inicioSemana.getDate() + 6);
+          const enEstaSemana = fechaStr => {
+            const [d, m, y] = fechaStr.split('/').map(Number);
+            const fecha = new Date(y, m - 1, d);
+            return fecha >= inicioSemana && fecha <= finSemana;
+          };
+          const reservados = MOCK_DB.turnos.filter(t => t.estado !== 'cancelado' && enEstaSemana(t.fecha)).length;
+          resolve(Math.max(0, CUPOS_PROMO_SEMANALES - reservados));
+        }, 300);
+      });
+    },
+
+    // TODO(supabase): upsert en clientes (incrementando cortes_count) + insert en turnos
+    guardarTurno({ fecha, hora, servicio, precio, nombre, telefono }){
+      return new Promise(resolve=>{
+        setTimeout(()=>{
+          MOCK_DB.turnos.push({ fecha, hora, servicio, precio, nombre, telefono, estado:'confirmado' });
+          const cliente = MOCK_DB.clientes[telefono];
+          if(cliente){
+            cliente.cortes_count += 1;
+            cliente.nombre = nombre;
+          } else {
+            MOCK_DB.clientes[telefono] = { nombre, cortes_count: 1 };
+          }
+          resolve(true);
+        }, 400);
+      });
+    },
+
+    // TODO(supabase): select nombre, cortes_count from clientes where telefono = telefono
+    getCliente(telefono){
+      return new Promise(resolve=>{
+        setTimeout(()=>{
+          resolve(MOCK_DB.clientes[telefono] || null);
+        }, 350);
+      });
+    }
+  };
+
+  const steps = document.querySelectorAll('.step-pill');
+  const panels = document.querySelectorAll('.step-panel');
+
+  function goToStep(n){
+    steps.forEach(s => s.classList.toggle('active', s.dataset.step === String(n)));
+    panels.forEach(p => p.classList.toggle('visible', p.dataset.panel === String(n)));
+  }
+
+  document.querySelectorAll('[data-back]').forEach(btn=>{
+    btn.addEventListener('click', ()=> goToStep(btn.dataset.back));
+  });
+
+  // Step 1: servicio
+  document.querySelectorAll('#serviceChoices .choice').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#serviceChoices .choice').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.service = btn.dataset.service;
+      state.price = btn.dataset.price;
+      document.getElementById('toStep2').disabled = false;
+    });
+  });
+  document.getElementById('toStep2').addEventListener('click', ()=> goToStep(2));
+
+  // Step 2: día — próximos días hábiles (saltea domingo y lunes, cerrado)
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const dayContainer = document.getElementById('dayChoices');
+  const horariosStatus = document.getElementById('horariosStatus');
+  const toStep3Btn = document.getElementById('toStep3');
+  const today = new Date();
+  let added = 0, offset = 1, mockSeedIndex = 0;
+  while(added < 6){
+    const d = new Date(today);
+    d.setDate(today.getDate() + offset);
+    offset++;
+    if(d.getDay() === 0 || d.getDay() === 1) continue; // cerrado domingo/lunes
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'day-chip';
+    chip.dataset.day = d.toLocaleDateString('es-AR');
+    chip.innerHTML = `<span class="d">${dayNames[d.getDay()]}</span><span class="n">${d.getDate()}</span>`;
+
+    // Sembramos un par de turnos de ejemplo en los dos primeros días para
+    // poder ver el bloqueo de horarios funcionando sin backend todavía.
+    // Se puede borrar en cuanto MOCK_DB deje de usarse.
+    if(mockSeedIndex < 2){
+      MOCK_DB.turnos.push({
+        fecha: chip.dataset.day,
+        hora: mockSeedIndex === 0 ? '11:20' : '16:20',
+        servicio: 'Corte clásico', precio: '$6.000',
+        nombre: 'Reserva demo', telefono: '0000000000', estado: 'confirmado'
+      });
+      mockSeedIndex++;
+    }
+
+    chip.addEventListener('click', async ()=>{
+      document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      const diaClickeado = chip.dataset.day;
+      state.day = diaClickeado;
+      state.dayDate = d;
+      state.horariosOcupados = null;
+      toStep3Btn.disabled = true;
+      horariosStatus.style.display = 'block';
+      horariosStatus.textContent = 'Consultando horarios disponibles...';
+
+      const ocupados = await DataService.getHorariosOcupados(diaClickeado);
+      if(state.day !== diaClickeado) return; // el usuario ya eligió otro día mientras tanto
+
+      state.horariosOcupados = ocupados;
+      horariosStatus.style.display = 'none';
+      toStep3Btn.disabled = false;
+    });
+    dayContainer.appendChild(chip);
+    added++;
+  }
+
+  // Step 3: horarios
+  const times = ['10:00','10:40','11:20','12:00','15:00','15:40','16:20','17:00','17:40','18:20'];
+  const timeContainer = document.getElementById('timeChoices');
+  const toStep4Btn = document.getElementById('toStep4');
+
+  function renderTimeGrid(ocupados){
+    timeContainer.innerHTML = '';
+    times.forEach(t=>{
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      const ocupado = ocupados.includes(t);
+      chip.className = 'time-chip' + (ocupado ? ' ocupado' : '');
+      chip.textContent = t;
+      if(ocupado){
+        chip.disabled = true;
+        chip.title = 'Ese horario ya está reservado';
+      } else {
+        chip.addEventListener('click', ()=>{
+          document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('selected'));
+          chip.classList.add('selected');
+          state.time = t;
+          toStep4Btn.disabled = false;
+        });
+      }
+      timeContainer.appendChild(chip);
+    });
+  }
+
+  toStep3Btn.addEventListener('click', ()=>{
+    state.time = null;
+    toStep4Btn.disabled = true;
+    renderTimeGrid(state.horariosOcupados || []);
+    goToStep(3);
+  });
+
+  toStep4Btn.addEventListener('click', ()=>{
+    document.getElementById('summaryLine').innerHTML =
+      `<strong>${state.service}</strong> · ${state.day} a las <strong>${state.time}</strong> · ${state.price}`;
+    goToStep(4);
+  });
+
+  // Genera un archivo .ics de 40 minutos para el turno elegido
+  function generarICS(){
+    const [h, m] = state.time.split(':').map(Number);
+    const start = new Date(state.dayDate);
+    start.setHours(h, m, 0, 0);
+    const end = new Date(start.getTime() + 40 * 60000);
+    const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    const ics = [
+      'BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',
+      `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
+      `SUMMARY:Turno en Cuervo Peluquería (${state.service})`,
+      'DESCRIPTION:Recordatorio de tu turno en Cuervo Peluquería.',
+      'END:VEVENT','END:VCALENDAR'
+    ].join('\r\n');
+    return 'data:text/calendar;charset=utf8,' + encodeURIComponent(ics);
+  }
+
+  // Cupos con descuento de bienvenida, calculados sobre los turnos reales de la semana
+  const cuposTexto = document.getElementById('cuposTexto');
+  async function actualizarCupos(){
+    cuposTexto.textContent = 'Calculando disponibilidad...';
+    const restantes = await DataService.getCuposRestantesSemana();
+    cuposTexto.textContent = restantes > 0
+      ? `Quedan ${restantes} turnos con descuento de bienvenida esta semana`
+      : 'Esta semana ya no quedan turnos con descuento de bienvenida';
+  }
+  actualizarCupos();
+
+  // Step 4: confirmar por WhatsApp
+  const confirmarBtn = document.getElementById('confirmarBtn');
+  const confirmarBtnTextoOriginal = confirmarBtn.textContent;
+  confirmarBtn.addEventListener('click', async ()=>{
+    const nombre = document.getElementById('nombre').value.trim();
+    if(!nombre){
+      document.getElementById('nombre').focus();
+      return;
+    }
+    const telefono = document.getElementById('telefono').value.trim();
+    if(!telefono){
+      document.getElementById('telefono').focus();
+      return;
+    }
+
+    confirmarBtn.disabled = true;
+    confirmarBtn.textContent = 'Guardando turno...';
+
+    await DataService.guardarTurno({
+      fecha: state.day, hora: state.time, servicio: state.service,
+      precio: state.price, nombre, telefono
+    });
+
+    const mensaje =
+`Hola! Quiero reservar un turno en Cuervo Peluquería.
+Servicio: ${state.service} (${state.price})
+Día: ${state.day}
+Hora: ${state.time}
+Nombre: ${nombre}
+Teléfono: ${telefono}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+
+    const calendarLink = document.getElementById('calendarLink');
+    calendarLink.href = generarICS();
+    calendarLink.setAttribute('download', 'turno-cuervo-peluqueria.ics');
+    calendarLink.style.display = 'inline-flex';
+
+    confirmarBtn.disabled = false;
+    confirmarBtn.textContent = confirmarBtnTextoOriginal;
+
+    actualizarCupos();
+  });
+
+  // Tarjeta de fidelidad
+  const fidelidadBtn = document.getElementById('fidelidadBtn');
+  const fidelidadInput = document.getElementById('fidelidadTelefono');
+  const fidelidadSlots = document.getElementById('fidelidadSlots');
+  const fidelidadTitulo = document.getElementById('fidelidadTitulo');
+  const fidelidadMsg = document.getElementById('fidelidadMsg');
+
+  function renderFidelidadSlots(cortesCount){
+    fidelidadSlots.innerHTML = '';
+    const sellosLlenos = cortesCount > 0 && cortesCount % 5 === 0 ? 5 : cortesCount % 5;
+    for(let i=0;i<5;i++){
+      const slot = document.createElement('div');
+      slot.className = 'fidelidad-slot' + (i < sellosLlenos ? ' sellado' : '');
+      if(i < sellosLlenos){
+        slot.innerHTML = '<svg viewBox="0 0 24 24" fill="#A32638"><path d="M8 20c4-10 12-18 24-18-8 4-14 10-16 18-2-1-6-1-8 0z" transform="scale(0.5) translate(4,4)"/></svg>';
+      }
+      fidelidadSlots.appendChild(slot);
+    }
+  }
+  renderFidelidadSlots(0);
+
+  fidelidadBtn.addEventListener('click', async ()=>{
+    const telefono = fidelidadInput.value.trim();
+    if(!telefono){
+      fidelidadInput.focus();
+      return;
+    }
+    fidelidadBtn.disabled = true;
+    fidelidadMsg.textContent = 'Buscando tu tarjeta...';
+
+    const cliente = await DataService.getCliente(telefono);
+    fidelidadBtn.disabled = false;
+
+    if(!cliente){
+      fidelidadTitulo.textContent = 'Todavía no tenés tarjeta';
+      fidelidadMsg.textContent = 'Reservá tu primer turno y arrancamos a contar tus cortes.';
+      renderFidelidadSlots(0);
+      return;
+    }
+
+    const enCiclo = cliente.cortes_count % 5;
+    if(cliente.cortes_count > 0 && enCiclo === 0){
+      fidelidadTitulo.textContent = `${cliente.nombre}, tu próximo corte va con 20% off`;
+      fidelidadMsg.textContent = 'Completaste el ciclo de 5 cortes.';
+    } else {
+      fidelidadTitulo.textContent = `${cliente.nombre}, vas ${enCiclo} de 5`;
+      fidelidadMsg.textContent = 'Cada 5 cortes, el sexto va con 20% off.';
+    }
+    renderFidelidadSlots(cliente.cortes_count);
+  });
+
+  // ---- Modo noche: automático después de las 19hs, con toggle manual ----
+  const themeToggle = document.getElementById('themeToggle');
+  function setDark(on){
+    document.body.classList.toggle('dark', on);
+    themeToggle.innerHTML = on
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  }
+  const hourNow = new Date().getHours();
+  setDark(hourNow >= 19 || hourNow < 7);
+  themeToggle.addEventListener('click', ()=> setDark(!document.body.classList.contains('dark')));
+})();
+</script>
+
+</body>
+</html>
