@@ -2,9 +2,10 @@
 // se muestra como banner; si no hay ninguno activo para ese `slot`, se
 // muestra una tarjeta invitando a anunciar (ver AdSlot.jsx).
 //
-// Para cargar un sponsor real, copiá este formato:
+// Hoy hay un solo espacio fijo, justo debajo del hero (slot="hero", ver
+// Home.jsx). Para cargar un sponsor real ahí, copiá este formato:
 // {
-//   slot: 'servicios',       // qué posición ocupa (ver dónde se usa <AdSlot slot="..." />)
+//   slot: 'hero',
 //   activo: true,
 //   nombre: 'Kiosco Don Pepe',
 //   imagen: '/ads/don-pepe.jpg',   // poné el archivo en /public/ads/

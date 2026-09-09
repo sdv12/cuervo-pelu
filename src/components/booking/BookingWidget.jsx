@@ -48,7 +48,7 @@ function TicketBody() {
 
 export default function BookingWidget() {
   return (
-    <section className="bg-azul px-5 py-14 text-hueso dark:bg-navy sm:px-6 sm:py-[72px]" id="turnos">
+    <section className="scroll-mt-16 bg-azul px-5 py-14 text-hueso dark:bg-navy sm:scroll-mt-[76px] sm:px-6 sm:py-[72px]" id="turnos">
       <div className="mx-auto max-w-[1080px]">
         <div className="mb-6 max-w-[56ch] sm:mb-8">
           <h2 className="text-[clamp(1.7rem,7vw,2.5rem)] uppercase text-hueso">Reservá tu turno</h2>

@@ -23,9 +23,13 @@ export default function Amenidades() {
                 key={a.id}
                 className="relative rounded-2xl border border-white/10 bg-white/5 p-5 text-center transition-colors hover:border-rojo/50 hover:bg-white/[0.07] sm:p-6"
               >
-                {a.gratis && (
+                {a.gratis ? (
                   <span className="absolute right-3 top-3 rounded-full bg-rojo px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
                     Gratis
+                  </span>
+                ) : (
+                  <span className="absolute right-3 top-3 rounded-full border border-dorado/60 bg-white/10 px-2 py-0.5 text-[0.65rem] font-bold text-dorado">
+                    {a.precio}
                   </span>
                 )}
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rojo/15 text-rojo sm:h-14 sm:w-14">

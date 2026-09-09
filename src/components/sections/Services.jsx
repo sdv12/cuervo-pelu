@@ -2,7 +2,7 @@ import { SERVICIOS } from '../../data/servicios'
 
 export default function Services() {
   return (
-    <section className="bg-panel px-5 py-14 dark:bg-navy sm:px-6 sm:py-[72px]" id="servicios">
+    <section className="scroll-mt-16 bg-panel px-5 py-14 dark:bg-navy sm:scroll-mt-[76px] sm:px-6 sm:py-[72px]" id="servicios">
       <div className="mx-auto max-w-[1080px]">
         <div className="mb-8 max-w-[56ch]">
           <h2 className="text-[clamp(1.9rem,3.4vw,2.5rem)] uppercase text-azul dark:text-navy-text">Servicios</h2>

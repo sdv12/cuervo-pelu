@@ -43,10 +43,6 @@ export default function Hero() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-2 -right-2 flex h-14 w-14 items-center justify-center rounded-full
-                              border-4 border-hueso bg-rojo text-white shadow-lg dark:border-navy sm:h-16 sm:w-16">
-                <MessageCircle size={22} />
-              </div>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ const ITEMS = [
 
 export default function WhyUs() {
   return (
-    <section className="px-5 py-14 sm:px-6 sm:py-[72px]" id="por-que">
+    <section className="scroll-mt-16 px-5 py-14 sm:scroll-mt-[76px] sm:px-6 sm:py-[72px]" id="por-que">
       <div className="mx-auto max-w-[1080px]">
         <div className="mb-8 max-w-[56ch]">
           <h2 className="text-[clamp(1.9rem,3.4vw,2.5rem)] uppercase text-azul dark:text-navy-text">Por qué nosotros</h2>
