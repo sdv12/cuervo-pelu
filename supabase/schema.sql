@@ -52,11 +52,14 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Nadie puede cambiarse a sí mismo el rol ni el estado: solo un admin.
+-- Un usuario no puede cambiarse a sí mismo el rol ni el estado. Solo lo
+-- puede hacer un admin, o el SQL Editor (auth.uid() null = contexto de
+-- confianza, para poder crear el primer admin).
 create or replace function public.proteger_rol()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   if (new.rol is distinct from old.rol or new.activo is distinct from old.activo)
+     and auth.uid() is not null
      and not public.es_admin() then
     raise exception 'solo un admin puede cambiar el rol o el estado de un perfil';
   end if;
