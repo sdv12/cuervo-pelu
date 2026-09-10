@@ -8,7 +8,8 @@ const initialState = {
   step: 1,
   service: null,
   price: null,
-  day: null,
+  day: null,       // label para mostrar (DD/MM/YYYY)
+  dayIso: null,    // clave de base de datos (YYYY-MM-DD)
   dayDate: null,
   time: null,
   horariosOcupados: null, // null = todavía no se consultó
@@ -16,6 +17,7 @@ const initialState = {
   cuposRestantes: null, // null = calculando
   saving: false,
   cancelando: false,
+  saveError: null, // 'ocupado' si el slot se tomó justo antes de confirmar
   confirmado: null, // { nombre, telefono, whatsappUrl, cancelado } tras confirmar
 }
 
@@ -26,18 +28,20 @@ function reducer(state, action) {
     case 'GO_TO_STEP':
       return { ...state, step: action.step }
     case 'SELECT_DAY_START':
-      return { ...state, day: action.day, dayDate: action.dayDate, horariosOcupados: null, loadingHorarios: true, time: null }
+      return { ...state, day: action.day, dayIso: action.dayIso, dayDate: action.dayDate, horariosOcupados: null, loadingHorarios: true, time: null }
     case 'SELECT_DAY_RESULT':
-      if (action.day !== state.day) return state // el usuario ya eligió otro día
+      if (action.dayIso !== state.dayIso) return state // el usuario ya eligió otro día
       return { ...state, horariosOcupados: action.horarios, loadingHorarios: false }
     case 'SELECT_TIME':
       return { ...state, time: action.time }
     case 'SET_CUPOS':
       return { ...state, cuposRestantes: action.cupos }
     case 'SAVE_START':
-      return { ...state, saving: true }
+      return { ...state, saving: true, saveError: null }
     case 'SAVE_DONE':
       return { ...state, saving: false, confirmado: action.confirmado }
+    case 'SAVE_ERROR':
+      return { ...state, saving: false, saveError: action.motivo }
     case 'CANCEL_START':
       return { ...state, cancelando: true }
     case 'CANCEL_DONE':
@@ -49,12 +53,12 @@ function reducer(state, action) {
   }
 }
 
-// Los mismos días hábiles se calculan una sola vez por carga de página,
-// y sembramos un par de turnos de ejemplo (ver bookingService) para poder
-// probar el bloqueo de horarios sin backend todavía.
+// Los días hábiles se calculan una sola vez por carga de página. Si no hay
+// Supabase configurado, sembramos un par de turnos de ejemplo (mock) para
+// ver el bloqueo de horarios funcionando.
 const diasHabiles = getProximosDiasHabiles(7)
-sembrarTurnoDemo(diasHabiles[0]?.label, '11:00')
-sembrarTurnoDemo(diasHabiles[1]?.label, '17:30')
+sembrarTurnoDemo(diasHabiles[0]?.iso, '11:00')
+sembrarTurnoDemo(diasHabiles[1]?.iso, '17:30')
 
 export function BookingProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -65,10 +69,10 @@ export function BookingProvider({ children }) {
 
   const irAPaso = useCallback(step => dispatch({ type: 'GO_TO_STEP', step }), [])
 
-  const seleccionarDia = useCallback(async (day, dayDate) => {
-    dispatch({ type: 'SELECT_DAY_START', day, dayDate })
-    const horarios = await bookingService.getHorariosOcupados(day)
-    dispatch({ type: 'SELECT_DAY_RESULT', day, horarios })
+  const seleccionarDia = useCallback(async ({ label, iso, fecha }) => {
+    dispatch({ type: 'SELECT_DAY_START', day: label, dayIso: iso, dayDate: fecha })
+    const horarios = await bookingService.getHorariosOcupados(iso)
+    dispatch({ type: 'SELECT_DAY_RESULT', dayIso: iso, horarios })
   }, [])
 
   const seleccionarHora = useCallback(time => dispatch({ type: 'SELECT_TIME', time }), [])
@@ -81,22 +85,31 @@ export function BookingProvider({ children }) {
 
   const confirmarTurno = useCallback(async ({ nombre, telefono, whatsappUrl }) => {
     dispatch({ type: 'SAVE_START' })
-    await bookingService.guardarTurno({
-      fecha: state.day, hora: state.time, servicio: state.service,
-      precio: state.price, nombre, telefono,
-    })
+    let res
+    try {
+      res = await bookingService.guardarTurno({
+        fecha: state.dayIso, hora: state.time, servicio: state.service,
+        precio: state.price, nombre, telefono,
+      })
+    } catch {
+      res = { ok: false, motivo: 'error' }
+    }
+    if (!res.ok) {
+      dispatch({ type: 'SAVE_ERROR', motivo: res.motivo })
+      return
+    }
     dispatch({ type: 'SAVE_DONE', confirmado: { nombre, telefono, whatsappUrl } })
     actualizarCupos()
-  }, [state.day, state.time, state.service, state.price, actualizarCupos])
+  }, [state.dayIso, state.time, state.service, state.price, actualizarCupos])
 
   const cancelarTurno = useCallback(async () => {
     dispatch({ type: 'CANCEL_START' })
     await bookingService.cancelarTurno({
-      fecha: state.day, hora: state.time, telefono: state.confirmado?.telefono,
+      fecha: state.dayIso, hora: state.time, telefono: state.confirmado?.telefono,
     })
     dispatch({ type: 'CANCEL_DONE' })
     actualizarCupos()
-  }, [state.day, state.time, state.confirmado, actualizarCupos])
+  }, [state.dayIso, state.time, state.confirmado, actualizarCupos])
 
   const reiniciar = useCallback(() => dispatch({ type: 'RESET' }), [])
 

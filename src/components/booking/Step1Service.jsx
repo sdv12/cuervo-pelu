@@ -1,5 +1,6 @@
 import { SERVICIOS } from '../../data/servicios'
 import { useBooking } from '../../context/BookingContext'
+import { formatearPrecio } from '../../utils/formato'
 
 export default function Step1Service() {
   const { state, seleccionarServicio, irAPaso } = useBooking()
@@ -20,7 +21,7 @@ export default function Step1Service() {
                 ${selected ? 'border-rojo bg-rojo/[0.06] dark:bg-rojo/10' : 'border-linea hover:border-rojo dark:border-navy-border'}`}
             >
               <strong className="block text-[0.95rem] text-azul dark:text-navy-text">{s.nombre}</strong>
-              <span className="text-[0.82rem] text-tinta-suave dark:text-navy-soft">{s.precio}</span>
+              <span className="text-[0.82rem] text-tinta-suave dark:text-navy-soft">{formatearPrecio(s.precio)}</span>
             </button>
           )
         })}

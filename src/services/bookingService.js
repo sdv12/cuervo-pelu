@@ -1,95 +1,132 @@
+import { supabase } from '../lib/supabase'
 import { CUPOS_PROMO_SEMANALES } from '../config/contact'
+import { fechaISO } from '../utils/businessDays'
 
 // ── Capa de datos ──────────────────────────────────────────────────────
-// Única puerta de entrada a turnos, cupos y clientes. Hoy lee/escribe en
-// MOCK_DB (memoria del navegador, se pierde al recargar). Cuando se
-// conecte Supabase, solo hace falta reescribir el cuerpo de estas cuatro
-// funciones para que usen el cliente de Supabase — los componentes que
-// las llaman no necesitan cambiar.
+// Si hay Supabase configurado, usa la base real. Si no, cae a MOCK_DB
+// (memoria del navegador) para poder trabajar sin backend.
 
+function semanaActualISO() {
+  const hoy = new Date()
+  const inicio = new Date(hoy)
+  inicio.setHours(0, 0, 0, 0)
+  inicio.setDate(hoy.getDate() - hoy.getDay())
+  const fin = new Date(inicio)
+  fin.setDate(inicio.getDate() + 6)
+  return { inicio: fechaISO(inicio), fin: fechaISO(fin) }
+}
+
+// ── Implementación Supabase ───────────────────────────────────────────
+const real = {
+  async getHorariosOcupados(fechaIso) {
+    const { data, error } = await supabase
+      .from('turnos_publicos').select('hora').eq('fecha', fechaIso)
+    if (error) throw error
+    return (data || []).map(r => String(r.hora).slice(0, 5))
+  },
+
+  async getCuposRestantesSemana() {
+    const { inicio, fin } = semanaActualISO()
+    const { count, error } = await supabase
+      .from('turnos_publicos').select('*', { count: 'exact', head: true })
+      .gte('fecha', inicio).lte('fecha', fin)
+    if (error) throw error
+    return Math.max(0, CUPOS_PROMO_SEMANALES - (count || 0))
+  },
+
+  // Devuelve { ok } o { ok:false, motivo:'ocupado' } si el slot se tomó justo antes.
+  async guardarTurno({ fecha, hora, servicio, precio, nombre, telefono }) {
+    const { data: sesion } = await supabase.auth.getSession()
+    const { error } = await supabase.from('turnos').insert({
+      fecha, hora, servicio, precio,
+      cliente_nombre: nombre, cliente_telefono: telefono,
+      perfil_id: sesion?.session?.user?.id ?? null,
+    })
+    if (error) {
+      if (error.code === '23505') return { ok: false, motivo: 'ocupado' }
+      throw error
+    }
+    return { ok: true }
+  },
+
+  async getCliente(telefono) {
+    const { data, error } = await supabase.rpc('sellos_por_telefono', { tel: telefono })
+    if (error) throw error
+    const row = data?.[0]
+    return row ? { nombre: row.nombre, cortes_count: row.cortes_count } : null
+  },
+
+  async cancelarTurno({ fecha, hora, telefono }) {
+    const { data, error } = await supabase.rpc('cancelar_turno', {
+      p_fecha: fecha, p_hora: hora, p_telefono: telefono,
+    })
+    if (error) throw error
+    return data === true
+  },
+}
+
+// ── Implementación mock (sin backend) ─────────────────────────────────
 const MOCK_DB = {
-  turnos: [], // { fecha, hora, servicio, precio, nombre, telefono, estado }
+  turnos: [], // { fecha (ISO), hora, servicio, precio, nombre, telefono, estado }
   clientes: {
-    // Cliente de ejemplo para poder probar la tarjeta de fidelidad ya mismo.
     '5491111111111': { nombre: 'Cliente Demo', cortes_count: 2 },
   },
 }
 
-// Sembramos un par de turnos de ejemplo para poder ver el bloqueo de
-// horarios funcionando sin backend todavía. Se puede borrar en cuanto
-// MOCK_DB deje de usarse.
-export function sembrarTurnoDemo(fecha, hora) {
-  if (MOCK_DB.turnos.some(t => t.fecha === fecha && t.hora === hora)) return
+export function sembrarTurnoDemo(fechaIso, hora) {
+  if (supabase || !fechaIso) return
+  if (MOCK_DB.turnos.some(t => t.fecha === fechaIso && t.hora === hora)) return
   MOCK_DB.turnos.push({
-    fecha, hora, servicio: 'Corte clásico', precio: '$6.000',
+    fecha: fechaIso, hora, servicio: 'Corte clásico', precio: 6000,
     nombre: 'Reserva demo', telefono: '0000000000', estado: 'confirmado',
   })
 }
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 
-const bookingService = {
-  // TODO(supabase): select hora from turnos_publicos where fecha = fechaStr
-  async getHorariosOcupados(fechaStr) {
-    await delay(350)
+const mock = {
+  async getHorariosOcupados(fechaIso) {
+    await delay(300)
     return MOCK_DB.turnos
-      .filter(t => t.fecha === fechaStr && t.estado !== 'cancelado')
+      .filter(t => t.fecha === fechaIso && t.estado !== 'cancelado')
       .map(t => t.hora)
   },
 
-  // TODO(supabase): contar turnos (estado <> 'cancelado') con fecha dentro de la semana actual
   async getCuposRestantesSemana() {
-    await delay(300)
-    const hoy = new Date()
-    const inicioSemana = new Date(hoy)
-    inicioSemana.setHours(0, 0, 0, 0)
-    inicioSemana.setDate(hoy.getDate() - hoy.getDay())
-    const finSemana = new Date(inicioSemana)
-    finSemana.setDate(inicioSemana.getDate() + 6)
-
-    const enEstaSemana = fechaStr => {
-      const [d, m, y] = fechaStr.split('/').map(Number)
-      const fecha = new Date(y, m - 1, d)
-      return fecha >= inicioSemana && fecha <= finSemana
-    }
-
-    const reservados = MOCK_DB.turnos.filter(t => t.estado !== 'cancelado' && enEstaSemana(t.fecha)).length
+    await delay(250)
+    const { inicio, fin } = semanaActualISO()
+    const reservados = MOCK_DB.turnos.filter(
+      t => t.estado !== 'cancelado' && t.fecha >= inicio && t.fecha <= fin
+    ).length
     return Math.max(0, CUPOS_PROMO_SEMANALES - reservados)
   },
 
-  // TODO(supabase): upsert en clientes (incrementando cortes_count) + insert en turnos
   async guardarTurno({ fecha, hora, servicio, precio, nombre, telefono }) {
-    await delay(400)
-    MOCK_DB.turnos.push({ fecha, hora, servicio, precio, nombre, telefono, estado: 'confirmado' })
-    const cliente = MOCK_DB.clientes[telefono]
-    if (cliente) {
-      cliente.cortes_count += 1
-      cliente.nombre = nombre
-    } else {
-      MOCK_DB.clientes[telefono] = { nombre, cortes_count: 1 }
+    await delay(350)
+    if (MOCK_DB.turnos.some(t => t.fecha === fecha && t.hora === hora && t.estado !== 'cancelado')) {
+      return { ok: false, motivo: 'ocupado' }
     }
-    return true
+    MOCK_DB.turnos.push({ fecha, hora, servicio, precio, nombre, telefono, estado: 'confirmado' })
+    if (!MOCK_DB.clientes[telefono]) MOCK_DB.clientes[telefono] = { nombre, cortes_count: 0 }
+    else MOCK_DB.clientes[telefono].nombre = nombre
+    return { ok: true }
   },
 
-  // TODO(supabase): select nombre, cortes_count from clientes where telefono = telefono
   async getCliente(telefono) {
-    await delay(350)
+    await delay(300)
     return MOCK_DB.clientes[telefono] || null
   },
 
-  // TODO(supabase): update turnos set estado='cancelado' where fecha=... and hora=... and telefono=...
-  // + decrementar clientes.cortes_count (un turno cancelado no debe contar para la fidelidad)
   async cancelarTurno({ fecha, hora, telefono }) {
-    await delay(350)
-    const turno = MOCK_DB.turnos.find(t => t.fecha === fecha && t.hora === hora && t.telefono === telefono)
-    if (!turno || turno.estado === 'cancelado') return false
+    await delay(300)
+    const turno = MOCK_DB.turnos.find(
+      t => t.fecha === fecha && t.hora === hora && t.telefono === telefono && t.estado === 'confirmado'
+    )
+    if (!turno) return false
     turno.estado = 'cancelado'
-    const cliente = MOCK_DB.clientes[telefono]
-    if (cliente) cliente.cortes_count = Math.max(0, cliente.cortes_count - 1)
     return true
   },
 }
 
+const bookingService = supabase ? real : mock
 export default bookingService

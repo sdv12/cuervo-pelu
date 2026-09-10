@@ -18,12 +18,12 @@ export default function Step2Day() {
       </div>
       <div className="flex gap-2.5 overflow-x-auto pb-1.5 -mx-1 px-1">
         {diasHabiles.map(d => {
-          const selected = state.day === d.label
+          const selected = state.dayIso === d.iso
           return (
             <button
-              key={d.label}
+              key={d.iso}
               type="button"
-              onClick={() => seleccionarDia(d.label, d.fecha)}
+              onClick={() => seleccionarDia(d)}
               className={`min-w-[64px] flex-shrink-0 rounded-[10px] border-[1.5px] bg-white px-3.5 py-3 text-center active:scale-[0.97]
                 dark:bg-navy-card
                 ${selected ? 'border-rojo bg-rojo/[0.06] dark:bg-rojo/10' : 'border-linea dark:border-navy-border'}`}

@@ -1,4 +1,5 @@
 import { SERVICIOS } from '../../data/servicios'
+import { formatearPrecio } from '../../utils/formato'
 
 export default function Services() {
   return (
@@ -18,7 +19,7 @@ export default function Services() {
                 {s.nota && <span className="mt-0.5 block text-[0.85rem] font-normal text-tinta-suave dark:text-navy-soft">{s.nota}</span>}
               </span>
               <span className="mb-1.5 min-w-6 flex-1 border-b-2 border-dotted border-tinta-suave opacity-40" />
-              <span className="whitespace-nowrap text-[1.05rem] font-semibold">{s.precio}</span>
+              <span className="whitespace-nowrap text-[1.05rem] font-semibold">{formatearPrecio(s.precio)}</span>
             </div>
           ))}
         </div>

@@ -1,7 +1,12 @@
+import { Link } from 'react-router-dom'
+import { UserRound } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 import ThemeToggle from './ThemeToggle'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Nav() {
+  const { disponible, usuario } = useAuth()
+
   return (
     <header className="sticky top-0 z-50 border-b border-linea bg-hueso/90 backdrop-blur-sm
                         dark:border-navy-border dark:bg-navy/90">
@@ -12,7 +17,7 @@ export default function Nav() {
             Cuervo Peluquería
           </span>
         </a>
-        <nav className="flex flex-shrink-0 items-center gap-4 sm:gap-7">
+        <nav className="flex flex-shrink-0 items-center gap-3 sm:gap-6">
           <a href="#servicios" className="hidden text-[0.95rem] font-medium text-tinta-suave hover:text-rojo dark:text-navy-soft sm:inline">
             Servicios
           </a>
@@ -22,6 +27,16 @@ export default function Nav() {
           <a href="#turnos" className="whitespace-nowrap rounded-md bg-rojo px-3.5 py-2 text-[0.82rem] font-semibold text-white hover:bg-rojo-2 sm:px-[18px] sm:py-2.5 sm:text-[0.9rem]">
             Reservar turno
           </a>
+          {disponible && (
+            <Link
+              to={usuario ? '/panel' : '/ingresar'}
+              aria-label={usuario ? 'Ir al panel' : 'Ingresar'}
+              className="flex items-center gap-1.5 text-[0.85rem] font-medium text-tinta-suave hover:text-rojo dark:text-navy-soft"
+            >
+              <UserRound size={17} />
+              <span className="hidden sm:inline">{usuario ? 'Panel' : 'Ingresar'}</span>
+            </Link>
+          )}
         </nav>
         <ThemeToggle />
       </div>

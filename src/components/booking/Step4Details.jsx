@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useBooking } from '../../context/BookingContext'
 import { WHATSAPP_NUMBER } from '../../config/contact'
+import { formatearPrecio } from '../../utils/formato'
 
 export default function Step4Details() {
   const { state, irAPaso, confirmarTurno } = useBooking()
@@ -17,7 +18,7 @@ export default function Step4Details() {
     const telefonoFinal = telefono.trim()
     const mensaje =
 `Hola! Quiero reservar un turno en Cuervo Peluquería.
-Servicio: ${state.service} (${state.price})
+Servicio: ${state.service} (${formatearPrecio(state.price)})
 Día: ${state.day}
 Hora: ${state.time}
 Nombre: ${nombreFinal}
@@ -61,8 +62,16 @@ Teléfono: ${telefonoFinal}`
 
       <div className="mt-4 border-t border-dashed border-linea pt-4 text-[0.88rem] text-tinta-suave dark:border-navy-border dark:text-navy-soft">
         <strong className="text-azul dark:text-navy-text">{state.service}</strong> · {state.day} a las{' '}
-        <strong className="text-azul dark:text-navy-text">{state.time}</strong> · {state.price}
+        <strong className="text-azul dark:text-navy-text">{state.time}</strong> · {formatearPrecio(state.price)}
       </div>
+
+      {state.saveError && (
+        <p className="mt-3 rounded-lg bg-rojo/10 px-3 py-2 text-[0.85rem] font-semibold text-rojo">
+          {state.saveError === 'ocupado'
+            ? 'Uy, ese horario se ocupó recién. Volvé atrás y elegí otro.'
+            : 'No pudimos guardar el turno. Probá de nuevo en un momento.'}
+        </p>
+      )}
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-5.5 sm:flex-row sm:justify-between">
         <button type="button" className="btn-ghost btn-small w-full justify-center sm:w-auto" onClick={() => irAPaso(3)}>

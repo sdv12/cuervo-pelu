@@ -19,26 +19,33 @@ exception when duplicate_object then null; end $$;
 create table if not exists perfiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   nombre     text not null,
+  email      text,
   telefono   text,
   rol        rol_usuario not null default 'cliente',
   activo     boolean not null default true,
   created_at timestamptz not null default now()
 );
+alter table perfiles add column if not exists email text;
 
 -- Crea el perfil automáticamente al registrarse un usuario (rol 'cliente').
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.perfiles (id, nombre, telefono, rol)
+  insert into public.perfiles (id, nombre, email, telefono, rol)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'nombre', split_part(new.email, '@', 1)),
+    new.email,
     new.raw_user_meta_data->>'telefono',
     'cliente'
   );
   return new;
 end;
 $$;
+
+-- Backfill del email para perfiles que ya existían.
+update public.perfiles p set email = u.email
+  from auth.users u where u.id = p.id and p.email is null;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -118,6 +125,22 @@ create trigger turno_estado_trigger
   before update on turnos
   for each row execute function public.on_turno_estado();
 
+-- Al reservar, asegura que exista la ficha del cliente (para la fidelidad).
+create or replace function public.on_turno_insert()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.clientes (telefono, nombre)
+  values (new.cliente_telefono, new.cliente_nombre)
+  on conflict (telefono) do update set nombre = excluded.nombre, updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists turno_insert_trigger on turnos;
+create trigger turno_insert_trigger
+  after insert on turnos
+  for each row execute function public.on_turno_insert();
+
 -- ── Helpers de rol ───────────────────────────────────────────────────
 create or replace function public.es_admin()
 returns boolean language sql stable security definer set search_path = public as $$
@@ -188,15 +211,40 @@ language sql stable security definer set search_path = public as $$
 $$;
 grant execute on function public.sellos_por_telefono(text) to anon, authenticated;
 
+-- ── Cancelar el propio turno (sin cuenta) ────────────────────────────
+-- Solo cancela si coinciden fecha + hora + teléfono (los datos que el
+-- cliente tiene porque acaba de reservar).
+create or replace function public.cancelar_turno(p_fecha date, p_hora time, p_telefono text)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare filas int;
+begin
+  update turnos set estado = 'cancelado'
+  where fecha = p_fecha and hora = p_hora
+    and cliente_telefono = p_telefono and estado = 'confirmado';
+  get diagnostics filas = row_count;
+  return filas > 0;
+end;
+$$;
+grant execute on function public.cancelar_turno(date, time, text) to anon, authenticated;
+
 -- ── Realtime: la agenda del panel se actualiza sola ──────────────────
 do $$ begin
   alter publication supabase_realtime add table turnos;
 exception when duplicate_object then null; end $$;
 
 -- =====================================================================
--- DESPUÉS de correr esto:
---   1. Authentication > Users > Add user  → creás tu usuario (email + pass).
---   2. Volvés al SQL Editor y te hacés admin:
+-- DESPUÉS de correr esto (una sola vez):
+--
+--   1. Authentication > Providers > Email  → destildá "Confirm email"
+--      (así el admin puede crear cuentas de empleado que entren directo).
+--
+--   2. Authentication > Users > Add user  → creás tu usuario (email + pass),
+--      tildando "Auto Confirm User".
+--
+--   3. Te hacés admin desde el SQL Editor (con tu email real):
 --        update perfiles set rol = 'admin'
---        where id = (select id from auth.users where email = 'TU-EMAIL');
+--        where email = 'TU-EMAIL';
+--
+--   4. (opcional) Limpiar turnos de prueba:
+--        delete from turnos;  delete from clientes;
 -- =====================================================================

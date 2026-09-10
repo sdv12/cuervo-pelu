@@ -1,7 +1,12 @@
 const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
-// Próximos días hábiles (saltea domingo y lunes, cerrado), con su fecha real
-// y la misma etiqueta 'DD/MM/YYYY' que usa la capa de datos como clave.
+// 'YYYY-MM-DD' en hora local (no UTC) — es la clave que usa la base de datos.
+export function fechaISO(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+// Próximos días hábiles (saltea domingo y lunes, cerrado). `iso` es la clave
+// de base de datos; `label` es para mostrar.
 export function getProximosDiasHabiles(cantidad = 6) {
   const dias = []
   const hoy = new Date()
@@ -13,6 +18,7 @@ export function getProximosDiasHabiles(cantidad = 6) {
     if (fecha.getDay() === 0 || fecha.getDay() === 1) continue // cerrado domingo/lunes
     dias.push({
       fecha,
+      iso: fechaISO(fecha),
       label: fecha.toLocaleDateString('es-AR'),
       nombreDia: DAY_NAMES[fecha.getDay()],
       numero: fecha.getDate(),
