@@ -110,11 +110,11 @@ create index if not exists turnos_estado_idx on turnos (estado);
 create or replace function public.on_turno_estado()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if new.estado = 'completado' and coalesce(old.estado, '') <> 'completado' then
+  if new.estado = 'completado' and old.estado is distinct from 'completado' then
     update clientes set cortes_count = cortes_count + 1, updated_at = now()
       where telefono = new.cliente_telefono;
     new.completado_at = now();
-  elsif old.estado = 'completado' and new.estado <> 'completado' then
+  elsif old.estado = 'completado' and new.estado is distinct from 'completado' then
     update clientes set cortes_count = greatest(0, cortes_count - 1), updated_at = now()
       where telefono = new.cliente_telefono;
     new.completado_at = null;
