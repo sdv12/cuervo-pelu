@@ -186,7 +186,7 @@ create policy "perfiles admin gestiona" on perfiles
 
 -- turnos: reservar es público; el staff ve y actualiza todo; el cliente ve los suyos
 drop policy if exists "turnos reservar" on turnos;
-create policy "turnos reservar" on turnos for insert with check (true);
+create policy "turnos reservar" on turnos for insert to anon, authenticated with check (true);
 
 drop policy if exists "turnos staff ve" on turnos;
 create policy "turnos staff ve" on turnos for select using (public.es_staff());
