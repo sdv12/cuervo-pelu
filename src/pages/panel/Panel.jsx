@@ -25,21 +25,23 @@ export default function Panel() {
 
   return (
     <div className="min-h-screen bg-hueso dark:bg-navy">
-      <header className="sticky top-0 z-40 border-b border-linea bg-hueso/95 backdrop-blur dark:border-navy-border dark:bg-navy/95">
-        <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 no-underline">
-            <BrandLogo className="h-8 w-8" />
-            <span className="hidden font-display text-[1rem] font-semibold text-azul dark:text-navy-text sm:inline">Panel</span>
+      <header className="sticky top-0 z-40 border-b border-linea bg-hueso/90 backdrop-blur-sm dark:border-navy-border dark:bg-navy/90">
+        <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-3.5">
+          <Link to="/" className="flex min-w-0 items-center gap-2 no-underline sm:gap-2.5">
+            <BrandLogo className="h-8 w-8 flex-shrink-0 sm:h-10 sm:w-10" />
+            <span className="hidden truncate font-display text-[1.15rem] font-semibold tracking-wide text-azul dark:text-navy-text sm:inline">
+              Cuervo Peluquería
+            </span>
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="hidden text-[0.85rem] text-tinta-suave dark:text-navy-soft sm:inline">
+          <div className="flex flex-shrink-0 items-center gap-3 sm:gap-6">
+            <span className="hidden text-[0.95rem] font-medium text-tinta-suave dark:text-navy-soft sm:inline">
               {perfil?.nombre} · <span className="capitalize">{rol}</span>
             </span>
             <button onClick={salir} className="btn-ghost btn-small">
               <LogOut size={15} /> <span className="hidden sm:inline">Salir</span>
             </button>
-            <ThemeToggle />
           </div>
+          <ThemeToggle />
         </div>
         {tabs.length > 1 && (
           <div className="mx-auto flex max-w-[1080px] gap-1 overflow-x-auto px-4 sm:px-6">

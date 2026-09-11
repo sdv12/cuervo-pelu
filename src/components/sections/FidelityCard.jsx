@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import bookingService from '../../services/bookingService'
+import { useAuth } from '../../context/AuthContext'
 
 function Sello({ lleno, rotar }) {
   return (
@@ -20,19 +21,35 @@ function Sello({ lleno, rotar }) {
   )
 }
 
+const rotaciones = [-6, 4, -3, 5, -5]
+
 export default function FidelityCard() {
+  const { usuario, perfil } = useAuth()
   const [telefono, setTelefono] = useState('')
   const [loading, setLoading] = useState(false)
   const [resultado, setResultado] = useState(null) // { encontrado, nombre, cortesCount }
 
-  async function buscar() {
-    if (!telefono.trim()) return
+  // Cliente reconocido: ya tiene sesión con teléfono asociado a su perfil.
+  const reconocido = Boolean(usuario && perfil?.telefono)
+
+  const buscarPorTelefono = useCallback(async tel => {
     setLoading(true)
-    const cliente = await bookingService.getCliente(telefono.trim())
+    const cliente = await bookingService.getCliente(tel)
     setLoading(false)
     setResultado(cliente
       ? { encontrado: true, nombre: cliente.nombre, cortesCount: cliente.cortes_count }
       : { encontrado: false })
+  }, [])
+
+  // Si está logueado y tiene teléfono, consulta su tarjeta sola — no hace
+  // falta que la tipee: la página ya sabe que es un cliente habitual.
+  useEffect(() => {
+    if (reconocido) buscarPorTelefono(perfil.telefono)
+  }, [reconocido, perfil?.telefono, buscarPorTelefono])
+
+  function buscarManual() {
+    if (!telefono.trim()) return
+    buscarPorTelefono(telefono.trim())
   }
 
   const cortesCount = resultado?.encontrado ? resultado.cortesCount : 0
@@ -43,19 +60,17 @@ export default function FidelityCard() {
   if (loading) {
     mensaje = 'Buscando tu tarjeta...'
   } else if (resultado && !resultado.encontrado) {
-    titulo = 'Todavía no tenés tarjeta'
+    titulo = reconocido ? '¡Hola de nuevo!' : 'Todavía no tenés tarjeta'
     mensaje = 'Reservá tu primer turno y arrancamos a sellarla.'
   } else if (resultado?.encontrado) {
     const enCiclo = sellosLlenos
     titulo = cortesCount > 0 && enCiclo === 5
-      ? `${resultado.nombre}, tu próximo corte va con 20% off`
-      : `${resultado.nombre}, vas ${enCiclo} de 5`
+      ? `¡${resultado.nombre}, tu próximo corte va con 20% off!`
+      : `¡Hola, ${resultado.nombre.split(' ')[0]}! Vas ${enCiclo} de 5`
     mensaje = cortesCount > 0 && enCiclo === 5
       ? 'Completaste el ciclo de 5 cortes.'
-      : 'Cada 5 cortes, el sexto va con 20% off.'
+      : 'Sos cliente habitual — cada 5 cortes, el sexto va con 20% off.'
   }
-
-  const rotaciones = [-6, 4, -3, 5, -5]
 
   return (
     <section className="px-5 py-14 sm:px-6 sm:py-[72px]">
@@ -71,6 +86,14 @@ export default function FidelityCard() {
           <span className="ticket-notch -left-3.5 bg-hueso dark:bg-navy" />
           <span className="ticket-notch -right-3.5 bg-hueso dark:bg-navy" />
 
+          {reconocido && (
+            <div className="mb-5 flex justify-center">
+              <span className="rounded-full bg-rojo px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                Cliente habitual
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-wrap justify-center gap-4 sm:gap-5">
             {Array.from({ length: 5 }, (_, i) => (
               <Sello key={i} lleno={i < sellosLlenos} rotar={rotaciones[i]} />
@@ -82,22 +105,24 @@ export default function FidelityCard() {
             <p className="mx-auto mt-1 max-w-[42ch] text-[0.9rem] text-tinta-suave dark:text-navy-soft">{mensaje}</p>
           </div>
 
-          <div className="mx-auto mt-6 flex max-w-[320px] items-center gap-2 border-t border-dashed border-linea pt-5 dark:border-navy-border">
-            <input
-              type="tel" value={telefono} onChange={e => setTelefono(e.target.value)}
-              placeholder="Tu teléfono"
-              className="min-w-0 flex-1 rounded-lg border-[1.5px] border-linea bg-white px-3 py-2.5 text-[0.9rem]
-                         focus:border-rojo dark:border-navy-border dark:bg-navy dark:text-navy-text"
-            />
-            <button
-              type="button"
-              className="btn-ghost flex-shrink-0 px-4 py-2.5 text-[0.85rem]"
-              disabled={loading}
-              onClick={buscar}
-            >
-              Ver
-            </button>
-          </div>
+          {!reconocido && (
+            <div className="mx-auto mt-6 flex max-w-[320px] items-center gap-2 border-t border-dashed border-linea pt-5 dark:border-navy-border">
+              <input
+                type="tel" value={telefono} onChange={e => setTelefono(e.target.value)}
+                placeholder="Tu teléfono"
+                className="min-w-0 flex-1 rounded-lg border-[1.5px] border-linea bg-white px-3 py-2.5 text-[0.9rem]
+                           focus:border-rojo dark:border-navy-border dark:bg-navy dark:text-navy-text"
+              />
+              <button
+                type="button"
+                className="btn-ghost flex-shrink-0 px-4 py-2.5 text-[0.85rem]"
+                disabled={loading}
+                onClick={buscarManual}
+              >
+                Ver
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
