@@ -155,6 +155,17 @@ returns boolean language sql stable security definer set search_path = public as
   select exists (select 1 from perfiles where id = auth.uid() and rol in ('admin','empleado') and activo);
 $$;
 
+-- ── Permisos de tabla ──────────────────────────────────────────────────
+-- RLS filtra FILAS, pero antes de eso Postgres exige permiso a nivel de
+-- TABLA para el rol que hace el pedido (anon/authenticated). Sin este
+-- grant, anon no puede ni intentar el insert aunque la política lo
+-- permita — la reserva sin cuenta queda rota.
+grant usage on schema public to anon, authenticated;
+grant insert on public.turnos to anon;                          -- reservar sin cuenta
+grant select, insert, update on public.turnos to authenticated;  -- staff (todo) y cliente (lo suyo) via RLS
+grant select, insert, update on public.clientes to authenticated;
+grant select, update on public.perfiles to authenticated;
+
 -- ── RLS ──────────────────────────────────────────────────────────────
 alter table perfiles enable row level security;
 alter table clientes enable row level security;
