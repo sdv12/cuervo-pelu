@@ -12,6 +12,7 @@ const PERIODOS = [
 export default function Reportes() {
   const [periodo, setPeriodo] = useState('dia')
   const [turnos, setTurnos] = useState([])
+  const [consumos, setConsumos] = useState([])
   const [cargando, setCargando] = useState(true)
 
   const rango = PERIODOS.find(p => p.id === periodo).rango()
@@ -19,17 +20,23 @@ export default function Reportes() {
   useEffect(() => {
     let vivo = true
     setCargando(true)
-    panelService.getCompletados({ desde: rango.desde, hasta: rango.hasta })
-      .then(d => { if (vivo) setTurnos(d) })
-      .catch(() => { if (vivo) setTurnos([]) })
+    Promise.all([
+      panelService.getCompletados({ desde: rango.desde, hasta: rango.hasta }),
+      panelService.getConsumos({ desde: rango.desde, hasta: rango.hasta }),
+    ])
+      .then(([t, c]) => { if (vivo) { setTurnos(t); setConsumos(c) } })
+      .catch(() => { if (vivo) { setTurnos([]); setConsumos([]) } })
       .finally(() => { if (vivo) setCargando(false) })
     return () => { vivo = false }
   }, [periodo, rango.desde, rango.hasta])
 
-  const total = turnos.reduce((s, t) => s + t.precio, 0)
+  const totalCortes = turnos.reduce((s, t) => s + t.precio, 0)
+  const totalProductos = consumos.reduce((s, c) => s + c.precio * c.cantidad, 0)
+  const total = totalCortes + totalProductos
 
   const porServicio = agrupar(turnos, t => t.servicio)
   const porDia = agrupar(turnos, t => t.fecha)
+  const porProducto = agruparProductos(consumos)
 
   return (
     <div>
@@ -59,6 +66,13 @@ export default function Reportes() {
             {porServicio.length === 0 && <Vacio />}
             {porServicio.map(([serv, x]) => (
               <Fila key={serv} a={serv} b={`${x.count} corte${x.count === 1 ? '' : 's'}`} c={formatearPrecio(x.monto)} />
+            ))}
+          </Seccion>
+
+          <Seccion titulo="Productos vendidos">
+            {porProducto.length === 0 && <Vacio />}
+            {porProducto.map(([prod, x]) => (
+              <Fila key={prod} a={prod} b={`${x.count} unidad${x.count === 1 ? '' : 'es'}`} c={formatearPrecio(x.monto)} />
             ))}
           </Seccion>
 
@@ -96,6 +110,16 @@ function agrupar(turnos, clave) {
     m[k].monto += t.precio
   }
   return Object.entries(m).sort((a, b) => (typeof a[0] === 'string' && a[0].includes('-') ? a[0].localeCompare(b[0]) : b[1].monto - a[1].monto))
+}
+
+function agruparProductos(consumos) {
+  const m = {}
+  for (const c of consumos) {
+    m[c.producto_nombre] = m[c.producto_nombre] || { count: 0, monto: 0 }
+    m[c.producto_nombre].count += c.cantidad
+    m[c.producto_nombre].monto += c.precio * c.cantidad
+  }
+  return Object.entries(m).sort((a, b) => b[1].monto - a[1].monto)
 }
 
 function Tarjeta({ titulo, valor }) {

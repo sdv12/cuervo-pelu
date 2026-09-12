@@ -11,6 +11,8 @@ const initialState = {
   barberoId: CUALQUIERA, // preferencia de quién atiende
   staff: [],
   staffCargando: true,
+  servicios: [],
+  serviciosCargando: true,
   day: null,       // label para mostrar (DD/MM/YYYY)
   dayIso: null,    // clave de base de datos (YYYY-MM-DD)
   dayDate: null,
@@ -32,6 +34,8 @@ function reducer(state, action) {
       return { ...state, step: action.step }
     case 'SET_STAFF':
       return { ...state, staff: action.staff, staffCargando: false }
+    case 'SET_SERVICIOS':
+      return { ...state, servicios: action.servicios, serviciosCargando: false }
     case 'SELECT_BARBERO':
       // cambiar de barbero invalida los horarios ya consultados para ese día
       return { ...state, barberoId: action.barberoId, horariosOcupados: null, time: null }
@@ -55,7 +59,12 @@ function reducer(state, action) {
     case 'CANCEL_DONE':
       return { ...state, cancelando: false, confirmado: { ...state.confirmado, cancelado: true } }
     case 'RESET':
-      return { ...initialState, staff: state.staff, staffCargando: false, cuposRestantes: state.cuposRestantes }
+      return {
+        ...initialState,
+        staff: state.staff, staffCargando: false,
+        servicios: state.servicios, serviciosCargando: false,
+        cuposRestantes: state.cuposRestantes,
+      }
     default:
       return state
   }
@@ -73,6 +82,7 @@ export function BookingProvider({ children }) {
 
   useEffect(() => {
     bookingService.getStaff().then(staff => dispatch({ type: 'SET_STAFF', staff }))
+    bookingService.getServicios().then(servicios => dispatch({ type: 'SET_SERVICIOS', servicios }))
   }, [])
 
   const seleccionarServicio = useCallback((service, price) => {

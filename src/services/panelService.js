@@ -47,6 +47,73 @@ export const panelService = {
     if (error) throw error
   },
 
+  // ── Precios: servicios (cortes) ─────────────────────────────────────
+  async getServiciosAdmin() {
+    const { data, error } = await supabase.from('servicios').select('*').order('orden', { ascending: true })
+    if (error) throw error
+    return data || []
+  },
+  async setPrecioServicio(id, precio) {
+    const { error } = await supabase.from('servicios').update({ precio }).eq('id', id)
+    if (error) throw error
+  },
+  async setActivoServicio(id, activo) {
+    const { error } = await supabase.from('servicios').update({ activo }).eq('id', id)
+    if (error) throw error
+  },
+
+  // ── Precios: productos (bebidas / snacks) ───────────────────────────
+  async getProductosAdmin() {
+    const { data, error } = await supabase.from('productos').select('*').order('orden', { ascending: true })
+    if (error) throw error
+    return data || []
+  },
+  async setPrecioProducto(id, precio) {
+    const { error } = await supabase.from('productos').update({ precio }).eq('id', id)
+    if (error) throw error
+  },
+  async setActivoProducto(id, activo) {
+    const { error } = await supabase.from('productos').update({ activo }).eq('id', id)
+    if (error) throw error
+  },
+
+  // ── Consumos: ventas de productos registradas por el staff ──────────
+  async registrarConsumo({ productoId, productoNombre, precio, cantidad, clienteNombre }) {
+    const { data: sesion } = await supabase.auth.getSession()
+    const { error } = await supabase.from('consumos').insert({
+      producto_id: productoId,
+      producto_nombre: productoNombre,
+      precio,
+      cantidad,
+      cliente_nombre: clienteNombre || null,
+      registrado_por: sesion?.session?.user?.id ?? null,
+    })
+    if (error) throw error
+  },
+  async getConsumos({ desde, hasta }) {
+    const { data, error } = await supabase.from('consumos').select('*')
+      .gte('created_at', desde).lte('created_at', hasta + 'T23:59:59')
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return data || []
+  },
+
+  // ── Registro de actividad (auditoría, solo admin) ───────────────────
+  async getActividad({ desde, hasta }) {
+    const { data, error } = await supabase.from('registro_actividad').select('*')
+      .gte('created_at', desde).lte('created_at', hasta + 'T23:59:59')
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    const filas = data || []
+    const ids = [...new Set(filas.map(f => f.perfil_id).filter(Boolean))]
+    let nombres = {}
+    if (ids.length) {
+      const { data: perfiles } = await supabase.from('perfiles').select('id, nombre').in('id', ids)
+      nombres = Object.fromEntries((perfiles || []).map(p => [p.id, p.nombre]))
+    }
+    return filas.map(f => ({ ...f, perfil_nombre: f.perfil_id ? (nombres[f.perfil_id] || 'Ex-usuario') : 'Cliente' }))
+  },
+
   // Realtime: llama a `callback` ante cualquier cambio en la tabla turnos.
   suscribirTurnos(callback) {
     const canal = supabase

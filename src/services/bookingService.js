@@ -53,6 +53,18 @@ const real = {
     return data || []
   },
 
+  async getServicios() {
+    const { data, error } = await supabase.from('servicios_publicos').select('*').order('orden', { ascending: true })
+    if (error) throw error
+    return data || []
+  },
+
+  async getProductos() {
+    const { data, error } = await supabase.from('productos_publicos').select('*').order('orden', { ascending: true })
+    if (error) throw error
+    return data || []
+  },
+
   async getHorariosOcupados(fechaIso, barberoId) {
     const { data, error } = await supabase
       .from('turnos_publicos').select('hora, barbero_id').eq('fecha', fechaIso)
@@ -120,6 +132,19 @@ const MOCK_STAFF = [
   { id: 'mock-empleado', nombre: 'Empleado Demo', rol: 'empleado' },
 ]
 
+const MOCK_SERVICIOS = [
+  { id: 'clasico', nombre: 'Corte clásico', precio: 6000, destacado: true },
+  { id: 'corte-barba', nombre: 'Corte + barba', precio: 8500 },
+  { id: 'barba', nombre: 'Barba y perfilado', precio: 4000 },
+  { id: 'fade', nombre: 'Diseño / fade', precio: 7500, nota: 'Incluye línea y dibujo a pedido' },
+  { id: 'ninos', nombre: 'Corte niños', precio: 5000 },
+]
+
+const MOCK_PRODUCTOS = [
+  { id: 'bebida', nombre: 'Birra o Coca', precio: 5000 },
+  { id: 'nueces', nombre: 'Nueces confitadas', precio: 9000 },
+]
+
 const MOCK_DB = {
   turnos: [], // { fecha (ISO), hora, servicio, precio, nombre, telefono, estado, barbero_id }
   clientes: {
@@ -143,6 +168,16 @@ const mock = {
   async getStaff() {
     await delay(150)
     return MOCK_STAFF
+  },
+
+  async getServicios() {
+    await delay(150)
+    return MOCK_SERVICIOS
+  },
+
+  async getProductos() {
+    await delay(150)
+    return MOCK_PRODUCTOS
   },
 
   async getHorariosOcupados(fechaIso, barberoId) {

@@ -128,6 +128,17 @@ begin
       where telefono = new.cliente_telefono;
     new.completado_at = null;
   end if;
+
+  if new.estado = 'cancelado' and old.estado is distinct from 'cancelado' then
+    insert into public.registro_actividad (tipo, descripcion, monto, perfil_id)
+    values (
+      'cancelacion',
+      new.cliente_nombre || ' canceló ' || new.servicio || ' del ' || to_char(new.fecha, 'DD/MM') || ' ' || to_char(new.hora, 'HH24:MI'),
+      new.precio,
+      auth.uid()
+    );
+  end if;
+
   return new;
 end;
 $$;
@@ -255,6 +266,172 @@ begin
 end;
 $$;
 grant execute on function public.cancelar_turno(date, time, text) to anon, authenticated;
+
+-- =====================================================================
+-- Registro de actividad (auditoría) — solo visible para admin. Nadie
+-- inserta acá directo: solo lo hacen los triggers de abajo (security
+-- definer), así el registro no se puede maquillar desde la app.
+-- =====================================================================
+do $$ begin
+  create type tipo_actividad as enum
+    ('precio_servicio', 'precio_producto', 'cancelacion', 'cliente_nuevo', 'venta_producto');
+exception when duplicate_object then null; end $$;
+
+create table if not exists registro_actividad (
+  id          uuid primary key default gen_random_uuid(),
+  tipo        tipo_actividad not null,
+  descripcion text not null,
+  monto       integer,        -- en pesos, cuando el evento tiene un valor asociado
+  perfil_id   uuid references perfiles(id) on delete set null,
+  created_at  timestamptz not null default now()
+);
+create index if not exists registro_actividad_fecha_idx on registro_actividad (created_at);
+
+alter table registro_actividad enable row level security;
+drop policy if exists "actividad solo admin" on registro_actividad;
+create policy "actividad solo admin" on registro_actividad
+  for select using (public.es_admin());
+grant select on public.registro_actividad to authenticated;
+
+-- ── Servicios (precios editables desde el panel) ──────────────────────
+create table if not exists servicios (
+  id        text primary key,
+  nombre    text not null,
+  precio    integer not null,
+  nota      text,
+  destacado boolean not null default false,
+  orden     integer not null default 0,
+  activo    boolean not null default true
+);
+insert into servicios (id, nombre, precio, nota, destacado, orden) values
+  ('clasico',     'Corte clásico',     6000, null, true,  1),
+  ('corte-barba', 'Corte + barba',     8500, null, false, 2),
+  ('barba',       'Barba y perfilado', 4000, null, false, 3),
+  ('fade',        'Diseño / fade',     7500, 'Incluye línea y dibujo a pedido', false, 4),
+  ('ninos',       'Corte niños',       5000, null, false, 5)
+on conflict (id) do nothing;
+
+alter table servicios enable row level security;
+drop policy if exists "servicios staff ve" on servicios;
+create policy "servicios staff ve" on servicios for select using (public.es_staff());
+drop policy if exists "servicios admin gestiona" on servicios;
+create policy "servicios admin gestiona" on servicios
+  for all using (public.es_admin()) with check (public.es_admin());
+grant select, insert, update on public.servicios to authenticated;
+
+create or replace view servicios_publicos as
+  select id, nombre, precio, nota, destacado, orden from servicios
+  where activo order by orden;
+grant select on servicios_publicos to anon, authenticated;
+
+create or replace function public.on_precio_servicio()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.precio is distinct from old.precio then
+    insert into public.registro_actividad (tipo, descripcion, monto, perfil_id)
+    values ('precio_servicio', new.nombre || ': $' || old.precio || ' → $' || new.precio, new.precio, auth.uid());
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists precio_servicio_trigger on servicios;
+create trigger precio_servicio_trigger
+  after update on servicios
+  for each row execute function public.on_precio_servicio();
+
+-- ── Productos (bebidas / snacks que se venden aparte del corte) ───────
+create table if not exists productos (
+  id     text primary key,
+  nombre text not null,
+  precio integer not null,
+  orden  integer not null default 0,
+  activo boolean not null default true
+);
+insert into productos (id, nombre, precio, orden) values
+  ('bebida', 'Birra o Coca',      5000, 1),
+  ('nueces', 'Nueces confitadas', 9000, 2)
+on conflict (id) do nothing;
+
+alter table productos enable row level security;
+drop policy if exists "productos staff ve" on productos;
+create policy "productos staff ve" on productos for select using (public.es_staff());
+drop policy if exists "productos admin gestiona" on productos;
+create policy "productos admin gestiona" on productos
+  for all using (public.es_admin()) with check (public.es_admin());
+grant select, insert, update on public.productos to authenticated;
+
+create or replace view productos_publicos as
+  select id, nombre, precio, orden from productos where activo order by orden;
+grant select on productos_publicos to anon, authenticated;
+
+create or replace function public.on_precio_producto()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.precio is distinct from old.precio then
+    insert into public.registro_actividad (tipo, descripcion, monto, perfil_id)
+    values ('precio_producto', new.nombre || ': $' || old.precio || ' → $' || new.precio, new.precio, auth.uid());
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists precio_producto_trigger on productos;
+create trigger precio_producto_trigger
+  after update on productos
+  for each row execute function public.on_precio_producto();
+
+-- ── Consumos (ventas de productos, registradas por el staff) ─────────
+create table if not exists consumos (
+  id              uuid primary key default gen_random_uuid(),
+  producto_id     text references productos(id) on delete set null,
+  producto_nombre text not null,   -- copia del nombre, por si el producto cambia o se borra
+  precio          integer not null, -- copia del precio al momento de la venta
+  cantidad        integer not null default 1,
+  cliente_nombre  text,
+  turno_id        uuid references turnos(id) on delete set null,
+  registrado_por  uuid references perfiles(id) on delete set null,
+  created_at      timestamptz not null default now()
+);
+create index if not exists consumos_fecha_idx on consumos (created_at);
+
+alter table consumos enable row level security;
+drop policy if exists "consumos staff ve" on consumos;
+create policy "consumos staff ve" on consumos for select using (public.es_staff());
+drop policy if exists "consumos staff registra" on consumos;
+create policy "consumos staff registra" on consumos
+  for insert to authenticated with check (public.es_staff());
+grant select, insert on public.consumos to authenticated;
+
+create or replace function public.on_consumo_insert()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.registro_actividad (tipo, descripcion, monto, perfil_id)
+  values (
+    'venta_producto',
+    new.cantidad || 'x ' || new.producto_nombre || coalesce(' — ' || new.cliente_nombre, ''),
+    new.precio * new.cantidad,
+    new.registrado_por
+  );
+  return new;
+end;
+$$;
+drop trigger if exists consumo_insert_trigger on consumos;
+create trigger consumo_insert_trigger
+  after insert on consumos
+  for each row execute function public.on_consumo_insert();
+
+-- ── Cliente nuevo (alta de ficha de fidelidad) ────────────────────────
+create or replace function public.on_cliente_nuevo()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.registro_actividad (tipo, descripcion, perfil_id)
+  values ('cliente_nuevo', new.nombre || ' — nuevo cliente (tel. ' || new.telefono || ')', auth.uid());
+  return new;
+end;
+$$;
+drop trigger if exists cliente_nuevo_trigger on clientes;
+create trigger cliente_nuevo_trigger
+  after insert on clientes
+  for each row execute function public.on_cliente_nuevo();
 
 -- ── Realtime: la agenda del panel se actualiza sola ──────────────────
 do $$ begin

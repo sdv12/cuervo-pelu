@@ -1,9 +1,20 @@
+import { useState, useEffect } from 'react'
 import { Gamepad2, Tv, CupSoda, Popcorn } from 'lucide-react'
 import { AMENIDADES } from '../../data/amenidades'
+import bookingService from '../../services/bookingService'
+import { formatearPrecio } from '../../utils/formato'
 
 const ICONOS = { gamepad: Gamepad2, tv: Tv, bebida: CupSoda, nueces: Popcorn }
 
 export default function Amenidades() {
+  const [precios, setPrecios] = useState({})
+
+  useEffect(() => {
+    bookingService.getProductos().then(productos => {
+      setPrecios(Object.fromEntries(productos.map(p => [p.id, p.precio])))
+    })
+  }, [])
+
   return (
     <section className="bg-azul px-5 py-14 text-hueso dark:bg-navy sm:px-6 sm:py-[72px]">
       <div className="mx-auto max-w-[1080px]">
@@ -29,7 +40,7 @@ export default function Amenidades() {
                   </span>
                 ) : (
                   <span className="absolute right-3 top-3 rounded-full border border-dorado/60 bg-white/10 px-2 py-0.5 text-[0.65rem] font-bold text-dorado">
-                    {a.precio}
+                    {precios[a.productoId] != null ? formatearPrecio(precios[a.productoId]) : '...'}
                   </span>
                 )}
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rojo/15 text-rojo sm:h-14 sm:w-14">

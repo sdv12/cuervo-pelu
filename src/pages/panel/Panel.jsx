@@ -7,6 +7,8 @@ import ThemeToggle from '../../components/layout/ThemeToggle'
 import Agenda from './Agenda'
 import Reportes from './Reportes'
 import Empleados from './Empleados'
+import Productos from './Productos'
+import Actividad from './Actividad'
 import MiTarjeta from './MiTarjeta'
 
 export default function Panel() {
@@ -16,7 +18,9 @@ export default function Panel() {
     ? [
         { id: 'agenda', label: 'Agenda', Comp: Agenda },
         { id: 'reportes', label: 'Reportes', Comp: Reportes },
+        { id: 'productos', label: 'Productos', Comp: Productos },
         ...(esAdmin ? [{ id: 'empleados', label: 'Empleados', Comp: Empleados }] : []),
+        ...(esAdmin ? [{ id: 'actividad', label: 'Actividad', Comp: Actividad }] : []),
       ]
     : [{ id: 'tarjeta', label: 'Mi tarjeta', Comp: MiTarjeta }]
 
