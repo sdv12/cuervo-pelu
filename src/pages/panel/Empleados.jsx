@@ -35,6 +35,7 @@ export default function Empleados() {
 
   const cambiarRol = async (p, rol) => { try { await panelService.setRol(p.id, rol); cargar() } catch (e) { alert(e.message) } }
   const toggleActivo = async p => { try { await panelService.setActivo(p.id, !p.activo); cargar() } catch (e) { alert(e.message) } }
+  const toggleAtiende = async p => { try { await panelService.setAtiende(p.id, !p.atiende); cargar() } catch (e) { alert(e.message) } }
 
   const equipo = perfiles.filter(p => p.rol !== 'cliente')
   const clientes = perfiles.filter(p => p.rol === 'cliente')
@@ -69,14 +70,21 @@ export default function Empleados() {
                 <div className="min-w-0">
                   <span className={`font-semibold text-azul dark:text-navy-text ${!p.activo ? 'line-through opacity-60' : ''}`}>{p.nombre}</span>
                   <span className="block text-[0.75rem] text-tinta-suave dark:text-navy-soft">{p.email}</span>
+                  <span className={`mt-0.5 inline-block rounded-full px-1.5 py-0.5 text-[0.68rem] font-semibold ${p.atiende ? 'bg-rojo/10 text-rojo' : 'bg-linea/50 text-tinta-suave dark:bg-navy-border/40 dark:text-navy-soft'}`}>
+                    {p.atiende ? 'Aparece para elegir al reservar' : 'No atiende clientes'}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <select value={p.rol} onChange={e => cambiarRol(p, e.target.value)} disabled={p.id === usuario.id}
                     className="rounded-md border border-linea bg-white px-2 py-1 text-[0.8rem] disabled:opacity-50 dark:border-navy-border dark:bg-navy dark:text-navy-text">
                     <option value="empleado">Empleado</option>
                     <option value="admin">Admin</option>
                     <option value="cliente">Cliente</option>
                   </select>
+                  <button onClick={() => toggleAtiende(p)}
+                    className="rounded-md border border-linea px-2 py-1 text-[0.8rem] text-tinta-suave dark:border-navy-border dark:text-navy-soft">
+                    {p.atiende ? 'Sacar de la reserva' : 'Sumar a la reserva'}
+                  </button>
                   <button onClick={() => toggleActivo(p)} disabled={p.id === usuario.id}
                     className="rounded-md border border-linea px-2 py-1 text-[0.8rem] text-tinta-suave disabled:opacity-50 dark:border-navy-border dark:text-navy-soft">
                     {p.activo ? 'Desactivar' : 'Activar'}

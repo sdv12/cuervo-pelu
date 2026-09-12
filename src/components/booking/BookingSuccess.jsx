@@ -2,6 +2,7 @@ import { CheckCircle2, XCircle, CalendarPlus, MessageCircle } from 'lucide-react
 import { useBooking } from '../../context/BookingContext'
 import { generarICS } from '../../utils/ics'
 import { WHATSAPP_NUMBER } from '../../config/contact'
+import { etiquetaRol } from '../../utils/formato'
 
 function horasHastaElTurno(dayDate, time) {
   const [h, m] = time.split(':').map(Number)
@@ -53,6 +54,12 @@ Nombre: ${state.confirmado?.nombre || ''}`
       <p className="mx-auto mt-2 max-w-[38ch] text-[0.95rem] text-tinta-suave dark:text-navy-soft">
         Te esperamos el <strong className="text-azul dark:text-navy-text">{state.day}</strong> a las{' '}
         <strong className="text-azul dark:text-navy-text">{state.time}</strong> para tu {state.service?.toLowerCase()}.
+        {state.confirmado?.barbero && (
+          <>
+            {' '}Te atiende <strong className="text-azul dark:text-navy-text">{state.confirmado.barbero.nombre}</strong>
+            {' '}({etiquetaRol(state.confirmado.barbero.rol)}).
+          </>
+        )}
       </p>
 
       <div className="mx-auto mt-6 flex max-w-[320px] flex-col gap-3">

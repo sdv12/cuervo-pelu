@@ -1,13 +1,18 @@
 import { useState } from 'react'
 import { useBooking } from '../../context/BookingContext'
 import { WHATSAPP_NUMBER } from '../../config/contact'
-import { formatearPrecio } from '../../utils/formato'
+import { CUALQUIERA } from '../../services/bookingService'
+import { formatearPrecio, etiquetaRol } from '../../utils/formato'
 
-export default function Step4Details() {
+export default function Step5Details() {
   const { state, irAPaso, confirmarTurno } = useBooking()
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
   const [error, setError] = useState(null)
+
+  const barberoElegido = state.barberoId !== CUALQUIERA
+    ? state.staff.find(s => s.id === state.barberoId)
+    : null
 
   function handleConfirmar() {
     if (!nombre.trim()) { setError('nombre'); return }
@@ -16,10 +21,13 @@ export default function Step4Details() {
 
     const nombreFinal = nombre.trim()
     const telefonoFinal = telefono.trim()
+    const lineaBarbero = barberoElegido
+      ? `Con: ${barberoElegido.nombre} (${etiquetaRol(barberoElegido.rol)})\n`
+      : ''
     const mensaje =
 `Hola! Quiero reservar un turno en Cuervo Peluquería.
 Servicio: ${state.service} (${formatearPrecio(state.price)})
-Día: ${state.day}
+${lineaBarbero}Día: ${state.day}
 Hora: ${state.time}
 Nombre: ${nombreFinal}
 Teléfono: ${telefonoFinal}`
@@ -63,6 +71,11 @@ Teléfono: ${telefonoFinal}`
       <div className="mt-4 border-t border-dashed border-linea pt-4 text-[0.88rem] text-tinta-suave dark:border-navy-border dark:text-navy-soft">
         <strong className="text-azul dark:text-navy-text">{state.service}</strong> · {state.day} a las{' '}
         <strong className="text-azul dark:text-navy-text">{state.time}</strong> · {formatearPrecio(state.price)}
+        {barberoElegido && (
+          <>
+            {' '}· Con <strong className="text-azul dark:text-navy-text">{barberoElegido.nombre}</strong>
+          </>
+        )}
       </div>
 
       {state.saveError && (
@@ -74,7 +87,7 @@ Teléfono: ${telefonoFinal}`
       )}
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-5.5 sm:flex-row sm:justify-between">
-        <button type="button" className="btn-ghost btn-small w-full justify-center sm:w-auto" onClick={() => irAPaso(3)}>
+        <button type="button" className="btn-ghost btn-small w-full justify-center sm:w-auto" onClick={() => irAPaso(4)}>
           Atrás
         </button>
         <button

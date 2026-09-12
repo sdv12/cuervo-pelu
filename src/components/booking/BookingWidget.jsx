@@ -2,12 +2,13 @@ import { useEffect } from 'react'
 import { BookingProvider, useBooking } from '../../context/BookingContext'
 import StepsBar from './StepsBar'
 import Step1Service from './Step1Service'
-import Step2Day from './Step2Day'
-import Step3Time from './Step3Time'
-import Step4Details from './Step4Details'
+import Step2Barbero from './Step2Barbero'
+import Step3Day from './Step3Day'
+import Step4Time from './Step4Time'
+import Step5Details from './Step5Details'
 import BookingSuccess from './BookingSuccess'
 
-const STEPS = { 1: Step1Service, 2: Step2Day, 3: Step3Time, 4: Step4Details }
+const STEPS = { 1: Step1Service, 2: Step2Barbero, 3: Step3Day, 4: Step4Time, 5: Step5Details }
 
 function CuposNote() {
   const { state, actualizarCupos } = useBooking()
@@ -53,7 +54,7 @@ export default function BookingWidget() {
         <div className="mb-6 max-w-[56ch] sm:mb-8">
           <h2 className="text-[clamp(1.7rem,7vw,2.5rem)] uppercase text-hueso">Reservá tu turno</h2>
           <p className="mt-2.5 text-[#C7CEDB]">
-            Cuatro pasos y listo — al final te llevamos a WhatsApp con todo ya escrito.
+            Cinco pasos y listo — al final te llevamos a WhatsApp con todo ya escrito.
           </p>
         </div>
         <BookingProvider>

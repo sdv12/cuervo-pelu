@@ -42,6 +42,10 @@ export const panelService = {
     const { error } = await supabase.from('perfiles').update({ activo }).eq('id', perfilId)
     if (error) throw error
   },
+  async setAtiende(perfilId, atiende) {
+    const { error } = await supabase.from('perfiles').update({ atiende }).eq('id', perfilId)
+    if (error) throw error
+  },
 
   // Realtime: llama a `callback` ante cualquier cambio en la tabla turnos.
   suscribirTurnos(callback) {

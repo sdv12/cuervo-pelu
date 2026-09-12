@@ -1,7 +1,7 @@
 import { getTurnosDelDia } from '../../utils/businessDays'
 import { useBooking } from '../../context/BookingContext'
 
-export default function Step3Time() {
+export default function Step4Time() {
   const { state, seleccionarHora, irAPaso } = useBooking()
   const ocupados = state.horariosOcupados || []
   const turnos = state.dayDate ? getTurnosDelDia(state.dayDate) : []
@@ -41,12 +41,12 @@ export default function Step3Time() {
       ))}
 
       <div className="mt-6 flex justify-between gap-3 sm:mt-5.5">
-        <button type="button" className="btn-ghost btn-small" onClick={() => irAPaso(2)}>Atrás</button>
+        <button type="button" className="btn-ghost btn-small" onClick={() => irAPaso(3)}>Atrás</button>
         <button
           type="button"
           className="btn-primary btn-small flex-1 justify-center sm:flex-none"
           disabled={!state.time}
-          onClick={() => irAPaso(4)}
+          onClick={() => irAPaso(5)}
         >
           Continuar
         </button>

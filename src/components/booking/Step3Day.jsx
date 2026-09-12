@@ -5,7 +5,7 @@ function rangoDeMeses(dias) {
   return meses.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(' / ')
 }
 
-export default function Step2Day() {
+export default function Step3Day() {
   const { state, diasHabiles, seleccionarDia, irAPaso } = useBooking()
 
   return (
@@ -40,12 +40,12 @@ export default function Step2Day() {
         <p className="loading-note">Consultando horarios disponibles...</p>
       )}
       <div className="mt-6 flex justify-between gap-3 sm:mt-5.5">
-        <button type="button" className="btn-ghost btn-small" onClick={() => irAPaso(1)}>Atrás</button>
+        <button type="button" className="btn-ghost btn-small" onClick={() => irAPaso(2)}>Atrás</button>
         <button
           type="button"
           className="btn-primary btn-small flex-1 justify-center sm:flex-none"
           disabled={!state.day || state.loadingHorarios}
-          onClick={() => irAPaso(3)}
+          onClick={() => irAPaso(4)}
         >
           Continuar
         </button>

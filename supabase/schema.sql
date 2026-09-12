@@ -23,9 +23,11 @@ create table if not exists perfiles (
   telefono   text,
   rol        rol_usuario not null default 'cliente',
   activo     boolean not null default true,
+  atiende    boolean not null default true,  -- aparece como opción para elegir en la reserva
   created_at timestamptz not null default now()
 );
 alter table perfiles add column if not exists email text;
+alter table perfiles add column if not exists atiende boolean not null default true;
 
 -- Crea el perfil automáticamente al registrarse un usuario (rol 'cliente').
 create or replace function public.handle_new_user()
@@ -95,12 +97,19 @@ create table if not exists turnos (
   cliente_telefono text not null,
   perfil_id        uuid references perfiles(id) on delete set null,  -- si reservó logueado
   estado           estado_turno not null default 'confirmado',
-  atendido_por     uuid references perfiles(id) on delete set null,  -- empleado que lo completó
+  barbero_id       uuid references perfiles(id) on delete set null,  -- a quién eligió el cliente
+  atendido_por     uuid references perfiles(id) on delete set null,  -- quién lo completó realmente
   completado_at    timestamptz,
   created_at       timestamptz not null default now()
 );
+alter table turnos add column if not exists barbero_id uuid references perfiles(id) on delete set null;
 
-create unique index if not exists turnos_slot_activo on turnos (fecha, hora)
+-- Un mismo slot (fecha+hora) ya no es único a nivel local: dos barberos
+-- distintos pueden atender en simultáneo. Lo que no puede pisarse es el
+-- mismo barbero dos veces a la misma hora (barbero_id null = turnos
+-- viejos sin barbero asignado; Postgres no los choca entre sí).
+drop index if exists turnos_slot_activo;
+create unique index if not exists turnos_slot_barbero_activo on turnos (fecha, hora, barbero_id)
   where estado <> 'cancelado';
 create index if not exists turnos_fecha_idx  on turnos (fecha);
 create index if not exists turnos_estado_idx on turnos (estado);
@@ -214,8 +223,14 @@ create policy "clientes actualizar" on clientes
 
 -- ── Vista pública de horarios ocupados (sin datos personales) ─────────
 create or replace view turnos_publicos as
-  select fecha, hora from turnos where estado <> 'cancelado';
+  select fecha, hora, barbero_id from turnos where estado <> 'cancelado';
 grant select on turnos_publicos to anon, authenticated;
+
+-- ── Vista pública de quién atiende (para elegir al reservar) ─────────
+create or replace view staff_publico as
+  select id, nombre, rol from perfiles
+  where rol in ('admin', 'empleado') and activo and atiende;
+grant select on staff_publico to anon, authenticated;
 
 -- ── Consulta de fidelidad por teléfono (anónima, solo devuelve el conteo) ──
 create or replace function public.sellos_por_telefono(tel text)
