@@ -94,7 +94,7 @@ export default function FidelityCard() {
             </div>
           )}
 
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-5">
+          <div className="-mx-6 flex justify-start gap-4 overflow-x-auto px-6 sm:mx-0 sm:justify-center sm:gap-5 sm:overflow-visible sm:px-0">
             {Array.from({ length: 5 }, (_, i) => (
               <Sello key={i} lleno={i < sellosLlenos} rotar={rotaciones[i]} />
             ))}

@@ -14,6 +14,10 @@ do $$ begin
   create type estado_turno as enum ('confirmado', 'cancelado', 'completado');
 exception when duplicate_object then null; end $$;
 
+do $$ begin
+  create type metodo_pago_tipo as enum ('efectivo', 'mercado_pago');
+exception when duplicate_object then null; end $$;
+
 -- ── perfiles ─────────────────────────────────────────────────────────
 -- Un perfil por usuario de Supabase Auth. El rol define los permisos.
 create table if not exists perfiles (
@@ -99,10 +103,12 @@ create table if not exists turnos (
   estado           estado_turno not null default 'confirmado',
   barbero_id       uuid references perfiles(id) on delete set null,  -- a quién eligió el cliente
   atendido_por     uuid references perfiles(id) on delete set null,  -- quién lo completó realmente
+  metodo_pago      metodo_pago_tipo,          -- se carga al marcar el turno como completado
   completado_at    timestamptz,
   created_at       timestamptz not null default now()
 );
 alter table turnos add column if not exists barbero_id uuid references perfiles(id) on delete set null;
+alter table turnos add column if not exists metodo_pago metodo_pago_tipo;
 
 -- Un mismo slot (fecha+hora) ya no es único a nivel local: dos barberos
 -- distintos pueden atender en simultáneo. Lo que no puede pisarse es el

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Check, X, RotateCcw } from 'lucide-react'
+import { Check, X, RotateCcw, Banknote, CreditCard } from 'lucide-react'
 import { panelService } from '../../services/panelService'
 import { useAuth } from '../../context/AuthContext'
 import { fechaISO } from '../../utils/businessDays'
@@ -11,11 +11,14 @@ const ESTADO_STYLE = {
   cancelado: 'bg-rojo/10 text-rojo',
 }
 
+const METODO_LABEL = { efectivo: 'Efectivo', mercado_pago: 'Mercado Pago' }
+
 export default function Agenda() {
   const { usuario } = useAuth()
   const [fecha, setFecha] = useState(fechaISO(new Date()))
   const [turnos, setTurnos] = useState([])
   const [cargando, setCargando] = useState(true)
+  const [confirmandoId, setConfirmandoId] = useState(null) // turno esperando que se elija método de pago
 
   const cargar = useCallback(async () => {
     setCargando(true)
@@ -33,9 +36,10 @@ export default function Agenda() {
   // Realtime: cualquier cambio en turnos recarga la agenda
   useEffect(() => panelService.suscribirTurnos(() => cargar()), [cargar])
 
-  async function cambiar(t, estado) {
+  async function cambiar(t, estado, metodoPago) {
     try {
-      await panelService.marcarEstado(t.id, estado, usuario.id)
+      await panelService.marcarEstado(t.id, estado, usuario.id, metodoPago)
+      setConfirmandoId(null)
       cargar()
     } catch (e) {
       alert('No se pudo actualizar: ' + (e.message || e))
@@ -79,6 +83,7 @@ export default function Agenda() {
                 <th className="py-2 pr-3">Servicio</th>
                 <th className="py-2 pr-3">Monto</th>
                 <th className="py-2 pr-3">Estado</th>
+                <th className="py-2 pr-3">Pago</th>
                 <th className="py-2">Acciones</th>
               </tr>
             </thead>
@@ -98,26 +103,47 @@ export default function Agenda() {
                       {t.estado}
                     </span>
                   </td>
+                  <td className="py-2.5 pr-3 text-[0.8rem] text-tinta-suave dark:text-navy-soft">
+                    {t.estado === 'completado' && t.metodo_pago ? METODO_LABEL[t.metodo_pago] : '—'}
+                  </td>
                   <td className="py-2.5">
-                    <div className="flex gap-1.5">
-                      {t.estado === 'confirmado' ? (
-                        <>
-                          <button onClick={() => cambiar(t, 'completado')} title="Marcar completado"
-                            className="rounded-md bg-green-500/15 p-1.5 text-green-700 hover:bg-green-500/25 dark:text-green-400">
-                            <Check size={15} />
-                          </button>
-                          <button onClick={() => cambiar(t, 'cancelado')} title="Cancelar"
-                            className="rounded-md bg-rojo/10 p-1.5 text-rojo hover:bg-rojo/20">
-                            <X size={15} />
-                          </button>
-                        </>
-                      ) : (
-                        <button onClick={() => cambiar(t, 'confirmado')} title="Volver a confirmado"
-                          className="rounded-md bg-linea/40 p-1.5 text-tinta-suave hover:bg-linea/70 dark:bg-navy-border/40 dark:text-navy-soft">
-                          <RotateCcw size={15} />
+                    {confirmandoId === t.id ? (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[0.75rem] text-tinta-suave dark:text-navy-soft">¿Cómo pagó?</span>
+                        <button onClick={() => cambiar(t, 'completado', 'efectivo')}
+                          className="flex items-center gap-1 rounded-md bg-green-500/15 px-2 py-1 text-[0.78rem] font-semibold text-green-700 hover:bg-green-500/25 dark:text-green-400">
+                          <Banknote size={13} /> Efectivo
                         </button>
-                      )}
-                    </div>
+                        <button onClick={() => cambiar(t, 'completado', 'mercado_pago')}
+                          className="flex items-center gap-1 rounded-md bg-azul/10 px-2 py-1 text-[0.78rem] font-semibold text-azul dark:bg-navy-soft/20 dark:text-navy-text">
+                          <CreditCard size={13} /> Mercado Pago
+                        </button>
+                        <button onClick={() => setConfirmandoId(null)} title="Cancelar"
+                          className="rounded-md p-1 text-tinta-suave hover:bg-linea/40 dark:text-navy-soft">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-1.5">
+                        {t.estado === 'confirmado' ? (
+                          <>
+                            <button onClick={() => setConfirmandoId(t.id)} title="Marcar completado"
+                              className="rounded-md bg-green-500/15 p-1.5 text-green-700 hover:bg-green-500/25 dark:text-green-400">
+                              <Check size={15} />
+                            </button>
+                            <button onClick={() => cambiar(t, 'cancelado')} title="Cancelar"
+                              className="rounded-md bg-rojo/10 p-1.5 text-rojo hover:bg-rojo/20">
+                              <X size={15} />
+                            </button>
+                          </>
+                        ) : (
+                          <button onClick={() => cambiar(t, 'confirmado')} title="Volver a confirmado"
+                            className="rounded-md bg-linea/40 p-1.5 text-tinta-suave hover:bg-linea/70 dark:bg-navy-border/40 dark:text-navy-soft">
+                            <RotateCcw size={15} />
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

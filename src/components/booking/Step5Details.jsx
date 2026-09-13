@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useBooking } from '../../context/BookingContext'
+import { useAuth } from '../../context/AuthContext'
 import { WHATSAPP_NUMBER } from '../../config/contact'
 import { CUALQUIERA } from '../../services/bookingService'
 import { formatearPrecio, etiquetaRol } from '../../utils/formato'
 
 export default function Step5Details() {
   const { state, irAPaso, confirmarTurno } = useBooking()
-  const [nombre, setNombre] = useState('')
-  const [telefono, setTelefono] = useState('')
+  const { perfil } = useAuth()
+  const [nombre, setNombre] = useState(perfil?.nombre || '')
+  const [telefono, setTelefono] = useState(perfil?.telefono || '')
   const [error, setError] = useState(null)
 
   const barberoElegido = state.barberoId !== CUALQUIERA

@@ -13,10 +13,10 @@ export const panelService = {
     return data || []
   },
 
-  async marcarEstado(turnoId, estado, atendidoPor) {
+  async marcarEstado(turnoId, estado, atendidoPor, metodoPago) {
     const patch = { estado }
-    if (estado === 'completado') patch.atendido_por = atendidoPor
-    else if (estado === 'confirmado') patch.atendido_por = null
+    if (estado === 'completado') { patch.atendido_por = atendidoPor; patch.metodo_pago = metodoPago }
+    else if (estado === 'confirmado') { patch.atendido_por = null; patch.metodo_pago = null }
     const { error } = await supabase.from('turnos').update(patch).eq('id', turnoId)
     if (error) throw error
   },

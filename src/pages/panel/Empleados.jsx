@@ -43,6 +43,11 @@ export default function Empleados() {
   return (
     <div>
       <h1 className="text-[1.4rem] uppercase text-azul dark:text-navy-text">Empleados</h1>
+      <div className="mt-2 rounded-lg border border-linea bg-panel px-3 py-2.5 text-[0.8rem] text-tinta-suave dark:border-navy-border dark:bg-navy-card dark:text-navy-soft">
+        <strong className="text-azul dark:text-navy-text">Empleado</strong>: Agenda, Reportes y Productos (puede registrar ventas, no editar precios).{' '}
+        <strong className="text-azul dark:text-navy-text">Admin</strong>: todo lo anterior + editar precios, gestionar empleados y ver Actividad.
+        No hay permisos individuales por persona — son fijos según el rol.
+      </div>
 
       <form onSubmit={crear} className="mt-4 grid gap-2.5 rounded-xl border border-linea bg-white p-4 dark:border-navy-border dark:bg-navy-card sm:grid-cols-3">
         <input required placeholder="Nombre" value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} className={INPUT} />

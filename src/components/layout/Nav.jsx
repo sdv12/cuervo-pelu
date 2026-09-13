@@ -5,7 +5,8 @@ import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Nav() {
-  const { disponible, usuario } = useAuth()
+  const { disponible, usuario, esStaff } = useAuth()
+  const etiqueta = usuario ? (esStaff ? 'Panel' : 'Mi cuenta') : 'Ingresar'
 
   return (
     <header className="sticky top-0 z-50 border-b border-linea bg-hueso/90 backdrop-blur-sm
@@ -30,11 +31,11 @@ export default function Nav() {
           {disponible && (
             <Link
               to={usuario ? '/panel' : '/ingresar'}
-              aria-label={usuario ? 'Ir al panel' : 'Ingresar'}
+              aria-label={etiqueta}
               className="flex items-center gap-1.5 text-[0.85rem] font-medium text-tinta-suave hover:text-rojo dark:text-navy-soft"
             >
               <UserRound size={17} />
-              <span className="hidden sm:inline">{usuario ? 'Panel' : 'Ingresar'}</span>
+              <span>{etiqueta}</span>
             </Link>
           )}
         </nav>

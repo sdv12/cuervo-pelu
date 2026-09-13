@@ -33,6 +33,8 @@ export default function Reportes() {
   const totalCortes = turnos.reduce((s, t) => s + t.precio, 0)
   const totalProductos = consumos.reduce((s, c) => s + c.precio * c.cantidad, 0)
   const total = totalCortes + totalProductos
+  const totalEfectivo = turnos.filter(t => t.metodo_pago === 'efectivo').reduce((s, t) => s + t.precio, 0)
+  const totalMercadoPago = turnos.filter(t => t.metodo_pago === 'mercado_pago').reduce((s, t) => s + t.precio, 0)
 
   const porServicio = agrupar(turnos, t => t.servicio)
   const porDia = agrupar(turnos, t => t.fecha)
@@ -61,6 +63,11 @@ export default function Reportes() {
             <Tarjeta titulo="Clientes atendidos" valor={turnos.length} />
             <Tarjeta titulo="Total cobrado" valor={formatearPrecio(total)} />
           </div>
+
+          <Seccion titulo="Cortes por método de pago">
+            <Fila a="Efectivo" b="" c={formatearPrecio(totalEfectivo)} />
+            <Fila a="Mercado Pago" b="" c={formatearPrecio(totalMercadoPago)} />
+          </Seccion>
 
           <Seccion titulo="Por servicio">
             {porServicio.length === 0 && <Vacio />}

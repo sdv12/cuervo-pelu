@@ -11,4 +11,12 @@
 //   imagen: '/ads/don-pepe.jpg',   // poné el archivo en /public/ads/
 //   link: 'https://wa.me/54911...',
 // }
-export const ESPACIOS_PUBLICITARIOS = []
+export const ESPACIOS_PUBLICITARIOS = [
+  {
+    slot: 'hero',
+    activo: true, // mock para ver cómo se ve un sponsor real — sacar cuando haya uno de verdad
+    nombre: 'Pizzería Don Mario',
+    imagen: '/ads/mock-pizzeria-don-mario.svg',
+    link: 'https://wa.me/5493511234567',
+  },
+]
