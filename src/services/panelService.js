@@ -78,7 +78,7 @@ export const panelService = {
   },
 
   // ── Consumos: ventas de productos registradas por el staff ──────────
-  async registrarConsumo({ productoId, productoNombre, precio, cantidad, clienteNombre }) {
+  async registrarConsumo({ productoId, productoNombre, precio, cantidad, clienteNombre, turnoId }) {
     const { data: sesion } = await supabase.auth.getSession()
     const { error } = await supabase.from('consumos').insert({
       producto_id: productoId,
@@ -86,9 +86,16 @@ export const panelService = {
       precio,
       cantidad,
       cliente_nombre: clienteNombre || null,
+      turno_id: turnoId || null,
       registrado_por: sesion?.session?.user?.id ?? null,
     })
     if (error) throw error
+  },
+  async getConsumosPorTurnos(turnoIds) {
+    if (!turnoIds.length) return []
+    const { data, error } = await supabase.from('consumos').select('*').in('turno_id', turnoIds)
+    if (error) throw error
+    return data || []
   },
   async getConsumos({ desde, hasta }) {
     const { data, error } = await supabase.from('consumos').select('*')

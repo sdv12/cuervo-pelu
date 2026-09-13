@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { panelService } from '../../services/panelService'
 import { useAuth } from '../../context/AuthContext'
+import { fechaISO } from '../../utils/businessDays'
 import { formatearPrecio } from '../../utils/formato'
 
 const INPUT = 'rounded-lg border-[1.5px] border-linea bg-white px-3 py-2 text-base dark:border-navy-border dark:bg-navy dark:text-navy-text'
@@ -46,12 +47,25 @@ function VentaRapida({ productos, onVendido }) {
   const [productoId, setProductoId] = useState('')
   const [cantidad, setCantidad] = useState(1)
   const [clienteNombre, setClienteNombre] = useState('')
+  const [turnoId, setTurnoId] = useState('')
+  const [turnosHoy, setTurnosHoy] = useState([])
   const [msg, setMsg] = useState(null)
   const [guardando, setGuardando] = useState(false)
 
   useEffect(() => {
     if (!productoId && productos.length) setProductoId(productos[0].id)
   }, [productos, productoId])
+
+  useEffect(() => {
+    const hoy = fechaISO(new Date())
+    panelService.getTurnos({ desde: hoy, hasta: hoy }).then(setTurnosHoy).catch(() => setTurnosHoy([]))
+  }, [])
+
+  function elegirTurno(id) {
+    setTurnoId(id)
+    const t = turnosHoy.find(x => x.id === id)
+    if (t) setClienteNombre(t.cliente_nombre)
+  }
 
   async function vender(e) {
     e.preventDefault()
@@ -61,10 +75,10 @@ function VentaRapida({ productos, onVendido }) {
     try {
       await panelService.registrarConsumo({
         productoId: producto.id, productoNombre: producto.nombre, precio: producto.precio,
-        cantidad: Number(cantidad) || 1, clienteNombre: clienteNombre.trim(),
+        cantidad: Number(cantidad) || 1, clienteNombre: clienteNombre.trim(), turnoId: turnoId || null,
       })
       setMsg({ tipo: 'ok', txt: 'Venta registrada.' })
-      setCantidad(1); setClienteNombre('')
+      setCantidad(1); setClienteNombre(''); setTurnoId('')
       onVendido()
     } catch (e) {
       setMsg({ tipo: 'error', txt: e.message })
@@ -87,7 +101,15 @@ function VentaRapida({ productos, onVendido }) {
             ))}
           </select>
           <input type="number" min={1} value={cantidad} onChange={e => setCantidad(e.target.value)} className={INPUT} placeholder="Cantidad" />
-          <input value={clienteNombre} onChange={e => setClienteNombre(e.target.value)} className={INPUT} placeholder="Cliente (opcional)" />
+          {turnosHoy.length > 0 && (
+            <select value={turnoId} onChange={e => elegirTurno(e.target.value)} className={`${INPUT} sm:col-span-2`}>
+              <option value="">Vincular a un turno de hoy (opcional)</option>
+              {turnosHoy.filter(t => t.estado !== 'cancelado').map(t => (
+                <option key={t.id} value={t.id}>{String(t.hora).slice(0, 5)} · {t.cliente_nombre}</option>
+              ))}
+            </select>
+          )}
+          <input value={clienteNombre} onChange={e => setClienteNombre(e.target.value)} className={`${INPUT} sm:col-span-2`} placeholder="Cliente (opcional)" />
           <button disabled={guardando} className="btn-primary btn-small justify-center sm:col-span-4">
             {guardando ? 'Guardando...' : 'Registrar venta'}
           </button>

@@ -402,6 +402,11 @@ create index if not exists consumos_fecha_idx on consumos (created_at);
 alter table consumos enable row level security;
 drop policy if exists "consumos staff ve" on consumos;
 create policy "consumos staff ve" on consumos for select using (public.es_staff());
+drop policy if exists "consumos cliente ve los suyos" on consumos;
+create policy "consumos cliente ve los suyos" on consumos
+  for select using (exists (
+    select 1 from turnos t where t.id = consumos.turno_id and t.perfil_id = auth.uid()
+  ));
 drop policy if exists "consumos staff registra" on consumos;
 create policy "consumos staff registra" on consumos
   for insert to authenticated with check (public.es_staff());
