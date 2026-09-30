@@ -1,10 +1,12 @@
-import { getTurnosDelDia } from '../../utils/businessDays'
+import { getTurnosDelDia, fechaISO } from '../../utils/businessDays'
 import { useBooking } from '../../context/BookingContext'
 
 export default function Step4Time() {
   const { state, seleccionarHora, irAPaso } = useBooking()
   const ocupados = state.horariosOcupados || []
   const turnos = state.dayDate ? getTurnosDelDia(state.dayDate) : []
+  const esHoy = state.dayIso === fechaISO(new Date())
+  const horaActual = esHoy ? new Date().toTimeString().slice(0, 5) : null
 
   return (
     <div>
@@ -19,16 +21,17 @@ export default function Step4Time() {
           )}
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))]">
             {grupo.horarios.map(t => {
-              const ocupado = ocupados.includes(t)
+              const pasado = esHoy && t <= horaActual
+              const ocupado = ocupados.includes(t) || pasado
               const selected = state.time === t
               return (
                 <button
                   key={t}
                   type="button"
                   disabled={ocupado}
-                  title={ocupado ? 'Ese horario ya está reservado' : undefined}
+                  title={pasado ? 'Ese horario ya pasó' : ocupado ? 'Ese horario ya está reservado' : undefined}
                   onClick={() => seleccionarHora(t)}
-                  className={`min-h-[48px] rounded-lg border-[1.5px] bg-white py-3 text-center text-[0.9rem] active:scale-[0.97] dark:bg-navy-card
+                  className={`min-h-[50px] rounded-lg border-[1.5px] bg-white py-3 text-center text-[0.92rem] active:scale-[0.97] dark:bg-navy-card
                     ${ocupado ? 'cursor-not-allowed opacity-35 line-through' : 'border-linea dark:border-navy-border'}
                     ${selected ? 'border-rojo bg-rojo/[0.06] font-semibold text-rojo dark:bg-rojo/10' : ''}`}
                 >

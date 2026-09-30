@@ -13,6 +13,17 @@ export const panelService = {
     return data || []
   },
 
+  // Carga rápida de un turno desde el panel (cliente que llega sin reservar
+  // antes, walk-in) — sin wizard ni WhatsApp, directo a la agenda.
+  async crearTurnoRapido({ fecha, hora, servicio, precio, barberoId, clienteNombre, clienteTelefono }) {
+    const { error } = await supabase.from('turnos').insert({
+      fecha, hora, servicio, precio,
+      cliente_nombre: clienteNombre, cliente_telefono: clienteTelefono,
+      barbero_id: barberoId || null, estado: 'confirmado',
+    })
+    if (error) throw error
+  },
+
   async marcarEstado(turnoId, estado, atendidoPor, metodoPago) {
     const patch = { estado }
     if (estado === 'completado') { patch.atendido_por = atendidoPor; patch.metodo_pago = metodoPago }

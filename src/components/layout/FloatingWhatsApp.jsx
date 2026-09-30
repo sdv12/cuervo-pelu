@@ -2,19 +2,25 @@ import { useEffect, useState } from 'react'
 import { MessageCircle } from 'lucide-react'
 import { WHATSAPP_NUMBER, WHATSAPP_MENSAJE_GENERICO } from '../../config/contact'
 
-// Se oculta mientras el widget de turnos (#turnos) está en pantalla: ahí ya
-// hay un camino de contacto claro y no queremos dos CTAs pisándose.
+// Se oculta mientras el widget de turnos (#turnos) o un banner de
+// publicidad (.ad-slot, ya trae su propio link de contacto) están en
+// pantalla: ahí ya hay un camino de contacto claro y no queremos dos
+// CTAs pisándose.
 export default function FloatingWhatsApp() {
   const [visible, setVisible] = useState(true)
 
   useEffect(() => {
-    const turnos = document.getElementById('turnos')
-    if (!turnos) return
+    const objetivos = [document.getElementById('turnos'), ...document.querySelectorAll('.ad-slot')].filter(Boolean)
+    if (!objetivos.length) return
+    const interseca = new Set()
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(!entry.isIntersecting),
+      entries => {
+        entries.forEach(e => { e.isIntersecting ? interseca.add(e.target) : interseca.delete(e.target) })
+        setVisible(interseca.size === 0)
+      },
       { threshold: 0.15 }
     )
-    observer.observe(turnos)
+    objetivos.forEach(el => observer.observe(el))
     return () => observer.disconnect()
   }, [])
 

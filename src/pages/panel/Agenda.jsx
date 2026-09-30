@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Check, X, RotateCcw, Banknote, CreditCard } from 'lucide-react'
+import { Check, X, RotateCcw, Banknote, CreditCard, UserPlus } from 'lucide-react'
 import { panelService } from '../../services/panelService'
+import bookingService from '../../services/bookingService'
 import { useAuth } from '../../context/AuthContext'
-import { fechaISO } from '../../utils/businessDays'
+import { fechaISO, getHorariosDelDia } from '../../utils/businessDays'
 import { formatearPrecio } from '../../utils/formato'
 
 const ESTADO_STYLE = {
@@ -12,6 +13,7 @@ const ESTADO_STYLE = {
 }
 
 const METODO_LABEL = { efectivo: 'Efectivo', mercado_pago: 'Mercado Pago' }
+const INPUT = 'rounded-lg border-[1.5px] border-linea bg-white px-3 py-2 text-base dark:border-navy-border dark:bg-navy dark:text-navy-text'
 
 export default function Agenda() {
   const { usuario } = useAuth()
@@ -19,6 +21,7 @@ export default function Agenda() {
   const [turnos, setTurnos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [confirmandoId, setConfirmandoId] = useState(null) // turno esperando que se elija método de pago
+  const [turnoRapido, setTurnoRapido] = useState(false)
 
   const cargar = useCallback(async () => {
     setCargando(true)
@@ -61,11 +64,29 @@ export default function Agenda() {
             </span>
           </p>
         </div>
-        <input
-          type="date" value={fecha} onChange={e => setFecha(e.target.value)}
-          className="rounded-lg border-[1.5px] border-linea bg-white px-3 py-2 text-[0.9rem] dark:border-navy-border dark:bg-navy-card dark:text-navy-text"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            type="date" value={fecha} onChange={e => setFecha(e.target.value)}
+            className="rounded-lg border-[1.5px] border-linea bg-white px-3 py-2 text-[0.9rem] dark:border-navy-border dark:bg-navy-card dark:text-navy-text"
+          />
+          <button
+            type="button"
+            onClick={() => setTurnoRapido(v => !v)}
+            className={`btn-small flex items-center gap-1.5 rounded-lg border-[1.5px] px-3 py-2 text-[0.85rem] font-semibold
+              ${turnoRapido ? 'border-rojo bg-rojo/10 text-rojo' : 'border-linea text-azul dark:border-navy-border dark:text-navy-text'}`}
+          >
+            <UserPlus size={15} /> Turno rápido
+          </button>
+        </div>
       </div>
+
+      {turnoRapido && (
+        <TurnoRapido
+          fecha={fecha}
+          turnosDelDia={turnos}
+          onCreado={() => { setTurnoRapido(false); cargar() }}
+        />
+      )}
 
       {cargando ? (
         <p className="loading-note">Cargando agenda...</p>
@@ -152,5 +173,78 @@ export default function Agenda() {
         </div>
       )}
     </div>
+  )
+}
+
+// Carga rápida de un turno para un cliente que llega sin haber reservado
+// antes (walk-in) — pensado para que Cristian o el empleado lo completen
+// en segundos, sin pasar por el wizard público ni por WhatsApp.
+function TurnoRapido({ fecha, turnosDelDia, onCreado }) {
+  const [servicios, setServicios] = useState([])
+  const [staff, setStaff] = useState([])
+  const [servicioId, setServicioId] = useState('')
+  const [barberoId, setBarberoId] = useState('')
+  const [hora, setHora] = useState('')
+  const [nombre, setNombre] = useState('')
+  const [telefono, setTelefono] = useState('')
+  const [msg, setMsg] = useState(null)
+  const [guardando, setGuardando] = useState(false)
+
+  useEffect(() => {
+    bookingService.getServicios().then(s => { setServicios(s); if (s.length) setServicioId(s[0].id) })
+    bookingService.getStaff().then(s => { setStaff(s); if (s.length) setBarberoId(s[0].id) })
+  }, [])
+
+  const horariosDelDia = getHorariosDelDia(new Date(fecha + 'T00:00'))
+  const ocupadosDeEseBarbero = turnosDelDia
+    .filter(t => t.estado !== 'cancelado' && t.barbero_id === barberoId)
+    .map(t => String(t.hora).slice(0, 5))
+  const horariosLibres = horariosDelDia.filter(h => !ocupadosDeEseBarbero.includes(h))
+
+  useEffect(() => {
+    if (!horariosLibres.includes(hora)) setHora(horariosLibres[0] || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barberoId, fecha])
+
+  async function crear(e) {
+    e.preventDefault()
+    const servicio = servicios.find(s => s.id === servicioId)
+    if (!servicio || !hora || !nombre.trim() || !telefono.trim()) { setMsg({ tipo: 'error', txt: 'Completá todos los campos.' }); return }
+    setMsg(null); setGuardando(true)
+    try {
+      await panelService.crearTurnoRapido({
+        fecha, hora, servicio: servicio.nombre, precio: servicio.precio,
+        barberoId, clienteNombre: nombre.trim(), clienteTelefono: telefono.trim(),
+      })
+      onCreado()
+    } catch (e) {
+      setMsg({ tipo: 'error', txt: e.message === 'duplicate key value violates unique constraint "turnos_slot_barbero_activo"'
+        ? 'Ese horario ya se ocupó, elegí otro.' : e.message })
+    }
+    setGuardando(false)
+  }
+
+  return (
+    <form onSubmit={crear} className="mb-4 grid gap-2.5 rounded-xl border border-linea bg-white p-4 dark:border-navy-border dark:bg-navy-card sm:grid-cols-6">
+      <h2 className="text-[0.78rem] font-semibold uppercase tracking-wide text-tinta-suave dark:text-navy-soft sm:col-span-6">
+        Turno rápido — cliente que llegó sin reservar
+      </h2>
+      <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre del cliente" className={`${INPUT} sm:col-span-2`} />
+      <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Teléfono" className={`${INPUT} sm:col-span-2`} />
+      <select value={servicioId} onChange={e => setServicioId(e.target.value)} className={`${INPUT} sm:col-span-2`}>
+        {servicios.map(s => <option key={s.id} value={s.id}>{s.nombre} — {formatearPrecio(s.precio)}</option>)}
+      </select>
+      <select value={barberoId} onChange={e => setBarberoId(e.target.value)} className={`${INPUT} sm:col-span-3`}>
+        {staff.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
+      </select>
+      <select value={hora} onChange={e => setHora(e.target.value)} className={`${INPUT} sm:col-span-3`}>
+        {horariosLibres.length === 0 && <option value="">Sin horarios libres hoy</option>}
+        {horariosLibres.map(h => <option key={h} value={h}>{h}</option>)}
+      </select>
+      <button disabled={guardando || !horariosLibres.length} className="btn-primary btn-small justify-center sm:col-span-6">
+        {guardando ? 'Guardando...' : 'Agregar a la agenda'}
+      </button>
+      {msg && <p className="text-[0.82rem] font-semibold text-rojo sm:col-span-6">{msg.txt}</p>}
+    </form>
   )
 }

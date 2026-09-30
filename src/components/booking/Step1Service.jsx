@@ -1,3 +1,4 @@
+import { CheckCircle2 } from 'lucide-react'
 import { useBooking } from '../../context/BookingContext'
 import { formatearPrecio } from '../../utils/formato'
 
@@ -18,12 +19,13 @@ export default function Step1Service() {
                 key={s.id}
                 type="button"
                 onClick={() => seleccionarServicio(s.nombre, s.precio)}
-                className={`min-h-[56px] rounded-lg border-[1.5px] bg-white px-4 py-3.5 text-left transition-colors active:scale-[0.98]
+                className={`relative min-h-[60px] rounded-lg border-[1.5px] bg-white px-4 py-4 text-left transition-colors active:scale-[0.98]
                   dark:bg-navy-card
                   ${selected ? 'border-rojo bg-rojo/[0.06] dark:bg-rojo/10' : 'border-linea hover:border-rojo dark:border-navy-border'}`}
               >
-                <strong className="block text-[0.95rem] text-azul dark:text-navy-text">{s.nombre}</strong>
-                <span className="text-[0.82rem] text-tinta-suave dark:text-navy-soft">{formatearPrecio(s.precio)}</span>
+                {selected && <CheckCircle2 size={19} className="absolute right-3 top-3 text-rojo" />}
+                <strong className="block pr-6 text-[1rem] text-azul dark:text-navy-text">{s.nombre}</strong>
+                <span className="text-[0.85rem] text-tinta-suave dark:text-navy-soft">{formatearPrecio(s.precio)}</span>
               </button>
             )
           })}

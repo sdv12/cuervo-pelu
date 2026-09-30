@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BookingProvider, useBooking } from '../../context/BookingContext'
 import StepsBar from './StepsBar'
+import ResumenChips from './ResumenChips'
 import Step1Service from './Step1Service'
 import Step2Barbero from './Step2Barbero'
 import Step3Day from './Step3Day'
@@ -40,6 +41,7 @@ function TicketBody() {
       <span className="ticket-notch -left-3.5" />
       <span className="ticket-notch -right-3.5" />
       {!state.confirmado && <StepsBar />}
+      {!state.confirmado && <ResumenChips />}
       <div className="p-5 sm:p-7">
         {state.confirmado ? <BookingSuccess /> : <StepComponent />}
       </div>

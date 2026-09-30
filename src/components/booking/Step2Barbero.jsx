@@ -1,4 +1,4 @@
-import { Shuffle, Scissors } from 'lucide-react'
+import { Shuffle, Scissors, CheckCircle2 } from 'lucide-react'
 import { useBooking } from '../../context/BookingContext'
 import { CUALQUIERA } from '../../services/bookingService'
 import { etiquetaRol } from '../../utils/formato'
@@ -14,17 +14,18 @@ export default function Step2Barbero() {
         <button
           type="button"
           onClick={() => seleccionarBarbero(CUALQUIERA)}
-          className={`flex min-h-[64px] items-center gap-3 rounded-lg border-[1.5px] bg-white px-4 py-3.5 text-left transition-colors active:scale-[0.98]
+          className={`relative flex min-h-[68px] items-center gap-3 rounded-lg border-[1.5px] bg-white px-4 py-4 text-left transition-colors active:scale-[0.98]
             dark:bg-navy-card
             ${state.barberoId === CUALQUIERA ? 'border-rojo bg-rojo/[0.06] dark:bg-rojo/10' : 'border-linea hover:border-rojo dark:border-navy-border'}`}
         >
-          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-azul/10 text-azul dark:bg-navy-soft/15 dark:text-navy-text">
-            <Shuffle size={17} />
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-azul/10 text-azul dark:bg-navy-soft/15 dark:text-navy-text">
+            <Shuffle size={18} />
           </span>
-          <span>
-            <strong className="block text-[0.95rem] text-azul dark:text-navy-text">Cualquiera disponible</strong>
-            <span className="text-[0.8rem] text-tinta-suave dark:text-navy-soft">Te asignamos quien tenga lugar</span>
+          <span className="pr-6">
+            <strong className="block text-[1rem] text-azul dark:text-navy-text">Cualquiera disponible</strong>
+            <span className="text-[0.82rem] text-tinta-suave dark:text-navy-soft">Te asignamos quien tenga lugar</span>
           </span>
+          {state.barberoId === CUALQUIERA && <CheckCircle2 size={19} className="absolute right-3 top-3 text-rojo" />}
         </button>
 
         {state.staffCargando && (
@@ -36,17 +37,18 @@ export default function Step2Barbero() {
             key={s.id}
             type="button"
             onClick={() => seleccionarBarbero(s.id)}
-            className={`flex min-h-[64px] items-center gap-3 rounded-lg border-[1.5px] bg-white px-4 py-3.5 text-left transition-colors active:scale-[0.98]
+            className={`relative flex min-h-[68px] items-center gap-3 rounded-lg border-[1.5px] bg-white px-4 py-4 text-left transition-colors active:scale-[0.98]
               dark:bg-navy-card
               ${state.barberoId === s.id ? 'border-rojo bg-rojo/[0.06] dark:bg-rojo/10' : 'border-linea hover:border-rojo dark:border-navy-border'}`}
           >
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rojo/10 text-rojo">
-              <Scissors size={16} />
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-rojo/10 text-rojo">
+              <Scissors size={17} />
             </span>
-            <span>
-              <strong className="block text-[0.95rem] text-azul dark:text-navy-text">{s.nombre}</strong>
-              <span className="text-[0.8rem] text-tinta-suave dark:text-navy-soft">{etiquetaRol(s.rol)}</span>
+            <span className="pr-6">
+              <strong className="block text-[1rem] text-azul dark:text-navy-text">{s.nombre}</strong>
+              <span className="text-[0.82rem] text-tinta-suave dark:text-navy-soft">{etiquetaRol(s.rol)}</span>
             </span>
+            {state.barberoId === s.id && <CheckCircle2 size={19} className="absolute right-3 top-3 text-rojo" />}
           </button>
         ))}
       </div>

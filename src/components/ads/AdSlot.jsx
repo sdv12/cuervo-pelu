@@ -12,7 +12,7 @@ export default function AdSlot({ slot }) {
   const espacio = ESPACIOS_PUBLICITARIOS.find(e => e.slot === slot && e.activo)
 
   return (
-    <div className="border-y-2 border-dorado/40 bg-panel px-5 py-4 dark:bg-navy-card sm:px-6 sm:py-5">
+    <div className="ad-slot border-y-2 border-dorado/40 bg-panel px-5 py-4 dark:bg-navy-card sm:px-6 sm:py-5">
       <div className="mx-auto max-w-[1080px]">
         <p className="mb-2.5 text-center text-[0.68rem] font-bold uppercase tracking-[0.18em] text-tinta-suave dark:text-navy-soft sm:text-left">
           Publicidad

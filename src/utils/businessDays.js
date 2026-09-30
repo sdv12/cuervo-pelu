@@ -5,22 +5,37 @@ export function fechaISO(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-// Próximos días hábiles (saltea domingo y lunes, cerrado). `iso` es la clave
-// de base de datos; `label` es para mostrar.
+// ¿Todavía queda algún horario por empezar hoy? Compara contra el último
+// slot del día (p. ej. sábado el último es 19:30) para saber si tiene
+// sentido ofrecer "hoy" como opción.
+function quedanHorariosHoy(ahora) {
+  const ultimo = getHorariosDelDia(ahora).at(-1)
+  if (!ultimo) return false
+  const [h, m] = ultimo.split(':').map(Number)
+  const limite = new Date(ahora)
+  limite.setHours(h, m, 0, 0)
+  return ahora < limite
+}
+
+// Próximos días hábiles (saltea domingo y lunes, cerrado). Si hoy todavía
+// tiene horarios por delante, es el primero de la lista — si no, arranca
+// mañana. `iso` es la clave de base de datos; `label` es para mostrar.
 export function getProximosDiasHabiles(cantidad = 6) {
   const dias = []
-  const hoy = new Date()
-  let offset = 1
+  const ahora = new Date()
+  let offset = 0
   while (dias.length < cantidad) {
-    const fecha = new Date(hoy)
-    fecha.setDate(hoy.getDate() + offset)
+    const fecha = new Date(ahora)
+    fecha.setDate(ahora.getDate() + offset)
     offset++
     if (fecha.getDay() === 0 || fecha.getDay() === 1) continue // cerrado domingo/lunes
+    const esHoy = fechaISO(fecha) === fechaISO(ahora)
+    if (esHoy && !quedanHorariosHoy(ahora)) continue // hoy ya no tiene turnos por delante
     dias.push({
       fecha,
       iso: fechaISO(fecha),
       label: fecha.toLocaleDateString('es-AR'),
-      nombreDia: DAY_NAMES[fecha.getDay()],
+      nombreDia: esHoy ? 'Hoy' : DAY_NAMES[fecha.getDay()],
       numero: fecha.getDate(),
     })
   }
