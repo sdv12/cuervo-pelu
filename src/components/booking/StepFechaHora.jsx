@@ -83,7 +83,7 @@ export default function StepFechaHora() {
                   {grupo.label}
                 </p>
               )}
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))]">
+              <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))] sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {grupo.horarios.map(t => {
                   const pasado = esHoy && t <= horaActual
                   const ocupado = ocupados.includes(t) || pasado
@@ -95,7 +95,7 @@ export default function StepFechaHora() {
                       disabled={ocupado}
                       title={pasado ? 'Ese horario ya pasó' : ocupado ? 'Ese horario ya está reservado' : undefined}
                       onClick={() => seleccionarHora(t)}
-                      className={`min-h-[50px] rounded-lg border-[1.5px] bg-white py-3 text-center text-[0.95rem] active:scale-[0.97] dark:bg-navy-card
+                      className={`min-h-[52px] min-w-[84px] flex-shrink-0 snap-start rounded-lg border-[1.5px] bg-white px-3 py-3 text-center text-[1rem] sm:min-w-0 active:scale-[0.97] dark:bg-navy-card
                         ${ocupado ? 'cursor-not-allowed border-linea opacity-35 line-through dark:border-navy-border' : 'border-linea dark:border-navy-border'}
                         ${selected ? 'border-rojo bg-rojo/[0.06] font-semibold text-rojo dark:bg-rojo/10' : ''}`}
                     >

@@ -23,7 +23,7 @@ export default function StepTurno() {
       {state.serviciosCargando ? (
         <p className="loading-note">Consultando servicios...</p>
       ) : (
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto -mx-5 px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-2.5 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {state.servicios.map(s => {
             const selected = state.service === s.nombre
             return (
@@ -31,7 +31,7 @@ export default function StepTurno() {
                 key={s.id}
                 type="button"
                 onClick={() => seleccionarServicio(s.nombre, s.precio)}
-                className={`${CARD} flex-col items-start ${selected ? SELECCIONADA : NO_SELECCIONADA}`}
+                className={`${CARD} w-[62vw] max-w-[260px] flex-shrink-0 snap-start flex-col !items-start sm:w-auto sm:max-w-none ${selected ? SELECCIONADA : NO_SELECCIONADA}`}
               >
                 <Check visible={selected} />
                 <strong className="block pr-6 text-[1rem] text-azul dark:text-navy-text">{s.nombre}</strong>
@@ -43,11 +43,11 @@ export default function StepTurno() {
       )}
 
       <h3 className="mb-3 mt-7 text-[1.2rem] uppercase text-azul dark:text-navy-text">¿Quién te atiende?</h3>
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+      <div className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto -mx-5 px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-2.5 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
           onClick={() => seleccionarBarbero(CUALQUIERA)}
-          className={`${CARD} ${state.barberoId === CUALQUIERA ? SELECCIONADA : NO_SELECCIONADA}`}
+          className={`${CARD} w-[62vw] max-w-[260px] flex-shrink-0 snap-start sm:w-auto sm:max-w-none ${state.barberoId === CUALQUIERA ? SELECCIONADA : NO_SELECCIONADA}`}
         >
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-azul/10 text-azul dark:bg-navy-soft/15 dark:text-navy-text">
             <Shuffle size={18} />
@@ -66,7 +66,7 @@ export default function StepTurno() {
             key={s.id}
             type="button"
             onClick={() => seleccionarBarbero(s.id)}
-            className={`${CARD} ${state.barberoId === s.id ? SELECCIONADA : NO_SELECCIONADA}`}
+            className={`${CARD} w-[62vw] max-w-[260px] flex-shrink-0 snap-start sm:w-auto sm:max-w-none ${state.barberoId === s.id ? SELECCIONADA : NO_SELECCIONADA}`}
           >
             <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-rojo/10 text-rojo">
               <Scissors size={17} />
