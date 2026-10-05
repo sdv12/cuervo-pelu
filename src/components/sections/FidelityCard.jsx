@@ -24,7 +24,7 @@ function Sello({ lleno, rotar }) {
 const rotaciones = [-6, 4, -3, 5, -5]
 
 export default function FidelityCard() {
-  const { usuario, perfil } = useAuth()
+  const { usuario, perfil, esAdmin } = useAuth()
   const [telefono, setTelefono] = useState('')
   const [loading, setLoading] = useState(false)
   const [resultado, setResultado] = useState(null) // { encontrado, nombre, cortesCount }
@@ -71,6 +71,9 @@ export default function FidelityCard() {
       ? 'Completaste el ciclo de 5 cortes.'
       : 'Sos cliente habitual — cada 5 cortes, el sexto va con 20% off.'
   }
+
+  // La tarjeta de sellos la maneja el empleado; el dueño no la ve.
+  if (esAdmin) return null
 
   return (
     <section className="px-5 py-14 sm:px-6 sm:py-[72px]">

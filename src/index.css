@@ -4,7 +4,7 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; font-size: 17px; }
   body {
     @apply font-sans antialiased bg-hueso text-tinta transition-colors duration-300;
   }
@@ -18,7 +18,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center gap-2 px-6 py-3 rounded-md font-semibold text-[0.98rem]
+    @apply inline-flex items-center gap-2 min-h-[52px] px-6 py-3 rounded-md font-semibold text-[1.02rem]
            transition-transform duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed;
   }
   .btn-primary {
@@ -29,7 +29,7 @@
            dark:text-navy-text dark:border-navy-border dark:hover:bg-azul-2 dark:hover:text-white;
   }
   .btn-small {
-    @apply px-5 py-2.5 text-sm;
+    @apply min-h-[50px] px-5 py-3 text-[1.02rem];
   }
 
   /* Etiqueta de sección: rótulo inclinado, como un sticker pegado en la pared del local */

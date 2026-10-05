@@ -1,8 +1,8 @@
 import Hero from '../components/sections/Hero'
 import AdSlot from '../components/ads/AdSlot'
 import BookingWidget from '../components/booking/BookingWidget'
-import WhyUs from '../components/sections/WhyUs'
 import Gallery from '../components/sections/Gallery'
+import WhyUs from '../components/sections/WhyUs'
 import Amenidades from '../components/sections/Amenidades'
 import Services from '../components/sections/Services'
 import Testimonials from '../components/sections/Testimonials'
@@ -15,11 +15,11 @@ export default function Home() {
       <Hero />
       <AdSlot slot="hero" />
       <BookingWidget />
-      <WhyUs />
       <Gallery />
       <Amenidades />
       <Services />
       <Testimonials />
+      <WhyUs />
       <FidelityCard />
       <InfoSection />
     </>
