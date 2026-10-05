@@ -32,6 +32,11 @@
     @apply px-5 py-2.5 text-sm;
   }
 
+  /* Etiqueta de sección: rótulo inclinado, como un sticker pegado en la pared del local */
+  .tag-canchera {
+    @apply inline-block -skew-x-6 bg-rojo px-3 py-1 font-display text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-hueso;
+  }
+
   /* Franja diagonal — el único quiebre estructural entre el hero y el resto */
   .stripe {
     height: 26px;

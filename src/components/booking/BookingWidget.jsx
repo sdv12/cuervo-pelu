@@ -2,14 +2,12 @@ import { useEffect } from 'react'
 import { BookingProvider, useBooking } from '../../context/BookingContext'
 import StepsBar from './StepsBar'
 import ResumenChips from './ResumenChips'
-import Step1Service from './Step1Service'
-import Step2Barbero from './Step2Barbero'
-import Step3Day from './Step3Day'
-import Step4Time from './Step4Time'
-import Step5Details from './Step5Details'
+import StepTurno from './StepTurno'
+import StepFechaHora from './StepFechaHora'
+import StepDatos from './StepDatos'
 import BookingSuccess from './BookingSuccess'
 
-const STEPS = { 1: Step1Service, 2: Step2Barbero, 3: Step3Day, 4: Step4Time, 5: Step5Details }
+const STEPS = { 1: StepTurno, 2: StepFechaHora, 3: StepDatos }
 
 function CuposNote() {
   const { state, actualizarCupos } = useBooking()
@@ -54,9 +52,10 @@ export default function BookingWidget() {
     <section className="scroll-mt-16 bg-azul px-5 py-14 text-hueso dark:bg-navy sm:scroll-mt-[76px] sm:px-6 sm:py-[72px]" id="turnos">
       <div className="mx-auto max-w-[1080px]">
         <div className="mb-6 max-w-[56ch] sm:mb-8">
-          <h2 className="text-[clamp(1.7rem,7vw,2.5rem)] uppercase text-hueso">Reservá tu turno</h2>
+          <span className="tag-canchera">Sin vueltas</span>
+          <h2 className="mt-3 text-[clamp(1.7rem,7vw,2.5rem)] uppercase text-hueso">Reservá tu turno</h2>
           <p className="mt-2.5 text-[#C7CEDB]">
-            Cinco pasos y listo — al final te llevamos a WhatsApp con todo ya escrito.
+            Tres pasos y listo — al final te llevamos a WhatsApp con todo ya escrito.
           </p>
         </div>
         <BookingProvider>

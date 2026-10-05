@@ -1,11 +1,9 @@
 import { useBooking } from '../../context/BookingContext'
 
 const PASOS = [
-  { n: 1, label: 'Servicio' },
-  { n: 2, label: 'Atendido por' },
-  { n: 3, label: 'Día' },
-  { n: 4, label: 'Hora' },
-  { n: 5, label: 'Tus datos' },
+  { n: 1, label: 'Tu turno' },
+  { n: 2, label: 'Día y hora' },
+  { n: 3, label: 'Tus datos' },
 ]
 
 export default function StepsBar() {

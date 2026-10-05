@@ -30,15 +30,9 @@ export default function ResumenChips() {
   if (state.service) {
     chips.push({ key: 'servicio', paso: 1, label: `${state.service} · ${formatearPrecio(state.price)}` })
   }
-  if (state.step > 2) {
-    chips.push({ key: 'barbero', paso: 2, label: barbero ? barbero.nombre : 'Cualquiera disponible' })
-  }
-  if (state.step > 3 && state.day) {
-    chips.push({ key: 'dia', paso: 3, label: state.day })
-  }
-  if (state.step > 4 && state.time) {
-    chips.push({ key: 'hora', paso: 4, label: state.time })
-  }
+  chips.push({ key: 'barbero', paso: 1, label: barbero ? barbero.nombre : 'Cualquiera disponible' })
+  if (state.day) chips.push({ key: 'dia', paso: 2, label: state.day })
+  if (state.time) chips.push({ key: 'hora', paso: 2, label: state.time })
 
   if (!chips.length) return null
 

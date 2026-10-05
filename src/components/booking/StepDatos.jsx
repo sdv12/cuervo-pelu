@@ -5,7 +5,7 @@ import { WHATSAPP_NUMBER } from '../../config/contact'
 import { CUALQUIERA } from '../../services/bookingService'
 import { formatearPrecio, etiquetaRol } from '../../utils/formato'
 
-export default function Step5Details() {
+export default function StepDatos() {
   const { state, irAPaso, confirmarTurno } = useBooking()
   const { perfil } = useAuth()
   const [nombre, setNombre] = useState(perfil?.nombre || '')
@@ -89,7 +89,7 @@ Teléfono: ${telefonoFinal}`
       )}
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-5.5 sm:flex-row sm:justify-between">
-        <button type="button" className="btn-ghost btn-small w-full justify-center sm:w-auto" onClick={() => irAPaso(4)}>
+        <button type="button" className="btn-ghost btn-small w-full justify-center sm:w-auto" onClick={() => irAPaso(2)}>
           Atrás
         </button>
         <button
