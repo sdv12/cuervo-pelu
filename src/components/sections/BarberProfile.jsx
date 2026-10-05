@@ -1,12 +1,12 @@
 export default function BarberProfile() {
   return (
     <div className="mt-11 flex flex-col gap-6 border-t border-linea pt-9 dark:border-navy-border sm:flex-row sm:items-start">
-      <div className="flex h-[76px] w-[76px] flex-shrink-0 items-center justify-center rounded-full bg-azul">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#EFEBE2" strokeWidth="2" className="h-[38px] w-[38px]">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-        </svg>
-      </div>
+      <img
+        src="/equipo/cristian.webp"
+        alt="Cristian, barbero y dueño de Cuervo Peluquería"
+        loading="lazy"
+        className="h-[96px] w-[96px] flex-shrink-0 rounded-full border-2 border-rojo object-cover object-top"
+      />
       <div>
         <h3 className="mb-1.5 text-[1.1rem] normal-case text-azul dark:text-navy-text">
           Cristian — al frente de la tijera

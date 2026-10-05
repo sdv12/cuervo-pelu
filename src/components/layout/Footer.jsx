@@ -1,5 +1,6 @@
 import BrandLogo from './BrandLogo'
 import { INSTAGRAM_URL } from '../../config/contact'
+import pkg from '../../../package.json'
 
 export default function Footer() {
   return (
@@ -16,6 +17,10 @@ export default function Footer() {
             Instagram
           </a>
         </div>
+      </div>
+      <div className="mx-auto mt-6 flex max-w-[1080px] flex-wrap justify-between gap-2 border-t border-navy-border/60 px-6 pt-5 text-[0.78rem] text-navy-soft">
+        <span>© {new Date().getFullYear()} Cuervo Peluquería · v{pkg.version}</span>
+        <span>Producto cordobés. Hecho por sdvi12</span>
       </div>
     </footer>
   )
