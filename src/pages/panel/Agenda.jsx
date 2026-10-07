@@ -3,7 +3,7 @@ import { Check, X, RotateCcw, Banknote, CreditCard, UserPlus } from 'lucide-reac
 import { panelService } from '../../services/panelService'
 import bookingService from '../../services/bookingService'
 import { useAuth } from '../../context/AuthContext'
-import { fechaISO, getHorariosDelDia } from '../../utils/businessDays'
+import { fechaISO, getHorariosDelDia, pasoPorRol } from '../../utils/businessDays'
 import { formatearPrecio } from '../../utils/formato'
 
 const ESTADO_STYLE = {
@@ -195,7 +195,8 @@ function TurnoRapido({ fecha, turnosDelDia, onCreado }) {
     bookingService.getStaff().then(s => { setStaff(s); if (s.length) setBarberoId(s[0].id) })
   }, [])
 
-  const horariosDelDia = getHorariosDelDia(new Date(fecha + 'T00:00'))
+  const barberoElegido = staff.find(s => s.id === barberoId)
+  const horariosDelDia = getHorariosDelDia(new Date(fecha + 'T00:00'), pasoPorRol(barberoElegido?.rol))
   const ocupadosDeEseBarbero = turnosDelDia
     .filter(t => t.estado !== 'cancelado' && t.barbero_id === barberoId)
     .map(t => String(t.hora).slice(0, 5))

@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { useBooking } from '../../context/BookingContext'
-import { getTurnosDelDia, fechaISO } from '../../utils/businessDays'
+import { CUALQUIERA } from '../../services/bookingService'
+import { getTurnosDelDia, getTurnosDelDiaCombinado, fechaISO, pasoPorRol } from '../../utils/businessDays'
 
 function rangoDeMeses(dias) {
   const meses = [...new Set(dias.map(d => d.fecha.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })))]
@@ -29,7 +30,10 @@ export default function StepFechaHora() {
   const { state, diasHabiles, seleccionarDia, seleccionarHora, irAPaso } = useBooking()
   const scrollRef = useRef(null)
   const ocupados = state.horariosOcupados || []
-  const turnos = state.dayDate ? getTurnosDelDia(state.dayDate) : []
+  const barbero = state.barberoId !== CUALQUIERA ? state.staff.find(s => s.id === state.barberoId) : null
+  const turnos = !state.dayDate ? [] : barbero
+    ? getTurnosDelDia(state.dayDate, pasoPorRol(barbero.rol))
+    : getTurnosDelDiaCombinado(state.dayDate)
   const esHoy = state.dayIso === fechaISO(new Date())
   const horaActual = esHoy ? new Date().toTimeString().slice(0, 5) : null
 

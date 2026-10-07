@@ -133,11 +133,9 @@ const MOCK_STAFF = [
 ]
 
 const MOCK_SERVICIOS = [
-  { id: 'clasico', nombre: 'Corte clásico', precio: 6000, destacado: true },
-  { id: 'corte-barba', nombre: 'Corte + barba', precio: 8500 },
-  { id: 'barba', nombre: 'Barba y perfilado', precio: 4000 },
-  { id: 'fade', nombre: 'Diseño / fade', precio: 7500, nota: 'Incluye línea y dibujo a pedido' },
-  { id: 'ninos', nombre: 'Corte niños', precio: 5000 },
+  { id: 'clasico', nombre: 'Corte', precio: 14000, destacado: true },
+  { id: 'ninos', nombre: 'Corte niño (hasta 10 años)', precio: 13000 },
+  { id: 'barba', nombre: 'Barba', precio: 9000 },
 ]
 
 const MOCK_PRODUCTOS = [

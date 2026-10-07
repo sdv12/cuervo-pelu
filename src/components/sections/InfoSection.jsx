@@ -8,13 +8,16 @@ export default function InfoSection() {
         <div>
           <h3 className="mb-3.5 text-[1.1rem] uppercase text-azul dark:text-navy-text">Horarios</h3>
           <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
-            <span className="text-tinta-suave dark:text-navy-soft">Martes a viernes</span><span>10:00–13:00 y 17:00–20:00</span>
+            <span className="text-tinta-suave dark:text-navy-soft">Lunes</span><span>17:00–20:30</span>
           </div>
           <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
-            <span className="text-tinta-suave dark:text-navy-soft">Sábados</span><span>9:00 — 20:00</span>
+            <span className="text-tinta-suave dark:text-navy-soft">Martes a viernes</span><span>10:00–14:00 y 16:00–21:00</span>
           </div>
           <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
-            <span className="text-tinta-suave dark:text-navy-soft">Domingos y lunes</span><span>Cerrado</span>
+            <span className="text-tinta-suave dark:text-navy-soft">Sábados</span><span>10:00–20:00</span>
+          </div>
+          <div className="flex justify-between border-b border-linea py-2.5 text-[0.95rem] dark:border-navy-border">
+            <span className="text-tinta-suave dark:text-navy-soft">Domingos</span><span>Cerrado</span>
           </div>
           <p className="mt-3.5 text-[0.85rem] italic text-tinta-suave dark:text-navy-soft">
             Y cerrado también los días que el Ciclón juega de local, obvio.

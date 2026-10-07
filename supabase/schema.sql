@@ -309,12 +309,12 @@ create table if not exists servicios (
   orden     integer not null default 0,
   activo    boolean not null default true
 );
-insert into servicios (id, nombre, precio, nota, destacado, orden) values
-  ('clasico',     'Corte clásico',     6000, null, true,  1),
-  ('corte-barba', 'Corte + barba',     8500, null, false, 2),
-  ('barba',       'Barba y perfilado', 4000, null, false, 3),
-  ('fade',        'Diseño / fade',     7500, 'Incluye línea y dibujo a pedido', false, 4),
-  ('ninos',       'Corte niños',       5000, null, false, 5)
+insert into servicios (id, nombre, precio, nota, destacado, orden, activo) values
+  ('clasico',     'Corte',                       14000, null, true,  1, true),
+  ('ninos',       'Corte niño (hasta 10 años)',  13000, null, false, 2, true),
+  ('barba',       'Barba',                        9000, null, false, 3, true),
+  ('corte-barba', 'Corte + barba',                8500, null, false, 4, false),
+  ('fade',        'Diseño / fade',                7500, 'Incluye línea y dibujo a pedido', false, 5, false)
 on conflict (id) do nothing;
 
 alter table servicios enable row level security;

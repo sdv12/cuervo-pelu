@@ -23,7 +23,7 @@ export default function Hero() {
             <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[0.88rem] text-tinta-suave dark:text-navy-soft sm:mt-6.5 sm:text-[0.9rem]">
               <span className="flex items-center gap-1.5">
                 <Clock size={16} className="text-rojo" />
-                Mar. a sáb. · 10 a 20 hs
+                Lun. a sáb. · Ver horarios
               </span>
               <span className="flex items-center gap-1.5">
                 <MessageCircle size={16} className="text-rojo" />
