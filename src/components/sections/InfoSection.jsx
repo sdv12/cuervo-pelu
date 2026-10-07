@@ -1,4 +1,4 @@
-import { MessageCircle, Instagram, MapPin } from 'lucide-react'
+import { MessageCircle, Instagram, MapPin, Banknote } from 'lucide-react'
 import { WHATSAPP_NUMBER, INSTAGRAM_URL, DIRECCION, MAPS_URL } from '../../config/contact'
 
 export default function InfoSection() {
@@ -21,6 +21,13 @@ export default function InfoSection() {
           </div>
           <p className="mt-3.5 text-[0.85rem] italic text-tinta-suave dark:text-navy-soft">
             Y cerrado también los días que el Ciclón juega de local, obvio.
+          </p>
+
+          <h3 className="mb-3.5 mt-8 flex items-center gap-2 text-[1.1rem] uppercase text-azul dark:text-navy-text">
+            <Banknote size={19} className="text-rojo" /> Medios de pago
+          </h3>
+          <p className="text-tinta-suave dark:text-navy-soft">
+            Efectivo o transferencia. Si transferís, nos mandás el comprobante por este mismo WhatsApp y listo.
           </p>
         </div>
         <div>

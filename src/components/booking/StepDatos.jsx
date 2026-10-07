@@ -80,6 +80,10 @@ Teléfono: ${telefonoFinal}`
         )}
       </div>
 
+      <p className="mt-3 text-[0.82rem] text-tinta-suave dark:text-navy-soft">
+        Se paga en el local: efectivo o transferencia (nos mandás el comprobante por WhatsApp).
+      </p>
+
       {state.saveError && (
         <p className="mt-3 rounded-lg bg-rojo/10 px-3 py-2 text-[0.85rem] font-semibold text-rojo">
           {state.saveError === 'ocupado'

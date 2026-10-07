@@ -13,7 +13,7 @@ const ESTADO_STYLE = {
   cancelado: 'bg-rojo/10 text-rojo',
 }
 
-const METODO_LABEL = { efectivo: 'Efectivo', mercado_pago: 'Mercado Pago' }
+const METODO_LABEL = { efectivo: 'Efectivo', mercado_pago: 'Transferencia' }
 
 export default function MiTarjeta() {
   const { usuario, perfil } = useAuth()

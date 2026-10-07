@@ -66,7 +66,7 @@ export default function Reportes() {
 
           <Seccion titulo="Cortes por método de pago">
             <Fila a="Efectivo" b="" c={formatearPrecio(totalEfectivo)} />
-            <Fila a="Mercado Pago" b="" c={formatearPrecio(totalMercadoPago)} />
+            <Fila a="Transferencia" b="" c={formatearPrecio(totalMercadoPago)} />
           </Seccion>
 
           <Seccion titulo="Por servicio">

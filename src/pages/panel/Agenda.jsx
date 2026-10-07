@@ -12,7 +12,7 @@ const ESTADO_STYLE = {
   cancelado: 'bg-rojo/10 text-rojo',
 }
 
-const METODO_LABEL = { efectivo: 'Efectivo', mercado_pago: 'Mercado Pago' }
+const METODO_LABEL = { efectivo: 'Efectivo', mercado_pago: 'Transferencia' }
 const INPUT = 'rounded-lg border-[1.5px] border-linea bg-white px-3 py-2 text-base dark:border-navy-border dark:bg-navy dark:text-navy-text'
 
 export default function Agenda() {
@@ -137,7 +137,7 @@ export default function Agenda() {
                         </button>
                         <button onClick={() => cambiar(t, 'completado', 'mercado_pago')}
                           className="flex items-center gap-1 rounded-md bg-azul/10 px-2 py-1 text-[0.78rem] font-semibold text-azul dark:bg-navy-soft/20 dark:text-navy-text">
-                          <CreditCard size={13} /> Mercado Pago
+                          <CreditCard size={13} /> Transferencia
                         </button>
                         <button onClick={() => setConfirmandoId(null)} title="Cancelar"
                           className="rounded-md p-1 text-tinta-suave hover:bg-linea/40 dark:text-navy-soft">
