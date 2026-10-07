@@ -311,9 +311,9 @@ create table if not exists servicios (
 );
 insert into servicios (id, nombre, precio, nota, destacado, orden, activo) values
   ('clasico',     'Corte',                       14000, null, true,  1, true),
-  ('ninos',       'Corte niño (hasta 10 años)',  13000, null, false, 2, true),
-  ('barba',       'Barba',                        9000, null, false, 3, true),
-  ('corte-barba', 'Corte + barba',                8500, null, false, 4, false),
+  ('corte-barba', 'Corte + barba',               23000, null, false, 2, true),
+  ('ninos',       'Corte niño (hasta 10 años)',  13000, null, false, 3, true),
+  ('barba',       'Barba',                        9000, null, false, 4, true),
   ('fade',        'Diseño / fade',                7500, 'Incluye línea y dibujo a pedido', false, 5, false)
 on conflict (id) do nothing;
 

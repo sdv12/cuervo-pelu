@@ -134,6 +134,7 @@ const MOCK_STAFF = [
 
 const MOCK_SERVICIOS = [
   { id: 'clasico', nombre: 'Corte', precio: 14000, destacado: true },
+  { id: 'corte-barba', nombre: 'Corte + barba', precio: 23000 },
   { id: 'ninos', nombre: 'Corte niño (hasta 10 años)', precio: 13000 },
   { id: 'barba', nombre: 'Barba', precio: 9000 },
 ]
