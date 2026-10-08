@@ -24,13 +24,11 @@ export default function EstadoLocal() {
     >
       <span className="flex items-center gap-2 text-[0.92rem] font-semibold text-azul dark:text-navy-text">
         <span className={`h-2.5 w-2.5 flex-shrink-0 rounded-full ${abierto ? 'animate-pulse bg-green-500' : 'bg-tinta-suave/50 dark:bg-navy-soft/50'}`} />
-        {abierto ? 'Estamos trabajando' : 'Estamos cerrados'}
+        {abierto ? 'Turnos disponibles para hoy' : 'Estamos cerrados'}
         <span className="font-normal text-tinta-suave dark:text-navy-soft">
-          {abierto
-            ? '· quedan estos horarios hoy'
-            : horarios.length
-              ? `· próximos turnos${esHoy ? ' de hoy' : ` (${dia.nombreDia.toLowerCase()} ${dia.numero})`}`
-              : ''}
+          {!abierto && horarios.length
+            ? `· próximos turnos${esHoy ? ' de hoy' : ` (${dia.nombreDia.toLowerCase()} ${dia.numero})`}`
+            : ''}
         </span>
       </span>
 
