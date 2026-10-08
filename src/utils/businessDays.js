@@ -101,3 +101,24 @@ export function getTurnosDelDiaCombinado(fecha) {
     horarios: [...new Set([...grupo.horarios, ...(b[i]?.horarios || [])])].sort(),
   }))
 }
+
+// ¿Hay alguien atendiendo en este preciso momento? (dentro de algún
+// bloque horario de hoy, sin importar quién atienda).
+export function estaAbiertoAhora(ahora = new Date()) {
+  const minutos = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m }
+  const actual = ahora.getHours() * 60 + ahora.getMinutes()
+  return bloquesDelDia(ahora).some(b => actual >= minutos(b.desde) && actual < minutos(b.hasta))
+}
+
+// Para el aviso en vivo del hero: si hoy todavía quedan horarios, los
+// próximos (desde ahora si ya estamos en el día); si no, los del
+// próximo día hábil. `dia` trae la etiqueta para mostrar ("Hoy", "Jue 9"...).
+export function getProximosHorarios(cantidad = 6) {
+  const [dia] = getProximosDiasHabiles(1)
+  if (!dia) return { dia: null, horarios: [] }
+  const esHoy = dia.nombreDia === 'Hoy'
+  const horaActual = esHoy ? new Date().toTimeString().slice(0, 5) : null
+  const todos = getTurnosDelDiaCombinado(dia.fecha).flatMap(g => g.horarios)
+  const horarios = (esHoy ? todos.filter(h => h > horaActual) : todos).slice(0, cantidad)
+  return { dia, horarios }
+}

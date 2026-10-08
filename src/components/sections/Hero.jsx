@@ -1,4 +1,5 @@
 import { Clock, MessageCircle } from 'lucide-react'
+import EstadoLocal from './EstadoLocal'
 
 export default function Hero() {
   return (
@@ -30,6 +31,7 @@ export default function Hero() {
                 Turnos por WhatsApp
               </span>
             </div>
+            <EstadoLocal />
           </div>
 
           <div className="flex items-center justify-center py-2 md:py-0">
