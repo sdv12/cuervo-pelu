@@ -3,6 +3,7 @@ export const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '54935124
 export const INSTAGRAM_URL = 'https://www.instagram.com/elcuervopeluqueria/'
 export const DIRECCION = 'Ovidio Lagos 221, Córdoba, Argentina 5000'
 export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(DIRECCION)}`
+export const GOOGLE_REVIEWS_URL = 'https://maps.app.goo.gl/1gad9gvM4huCd5XG9'
 export const CUPOS_PROMO_SEMANALES = 4 // techo semanal de turnos con descuento de bienvenida
 export const WHATSAPP_MENSAJE_GENERICO = 'Hola! Quiero consultar sobre un turno en Cuervo Peluquería.'
 export const WHATSAPP_MENSAJE_PUBLICIDAD = 'Hola! Quiero averiguar sobre anunciar mi negocio en la página de Cuervo Peluquería.'
