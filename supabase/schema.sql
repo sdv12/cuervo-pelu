@@ -444,6 +444,36 @@ create trigger cliente_nuevo_trigger
   after insert on clientes
   for each row execute function public.on_cliente_nuevo();
 
+-- ── Lista de espera (avisame si se libera un horario ocupado) ───────
+do $$ begin
+  create type estado_espera as enum ('pendiente', 'avisado', 'cancelado');
+exception when duplicate_object then null; end $$;
+
+create table if not exists lista_espera (
+  id               uuid primary key default gen_random_uuid(),
+  fecha            date not null,
+  hora             time not null,
+  barbero_id       uuid references perfiles(id) on delete set null,  -- null = cualquiera
+  servicio         text,
+  cliente_nombre   text not null,
+  cliente_telefono text not null,
+  perfil_id        uuid references perfiles(id) on delete set null,
+  estado           estado_espera not null default 'pendiente',
+  created_at       timestamptz not null default now()
+);
+create index if not exists lista_espera_fecha_idx on lista_espera (fecha);
+
+alter table lista_espera enable row level security;
+drop policy if exists "espera anotarse" on lista_espera;
+create policy "espera anotarse" on lista_espera for insert to anon, authenticated with check (true);
+drop policy if exists "espera staff ve" on lista_espera;
+create policy "espera staff ve" on lista_espera for select using (public.es_staff());
+drop policy if exists "espera staff actualiza" on lista_espera;
+create policy "espera staff actualiza" on lista_espera
+  for update using (public.es_staff()) with check (public.es_staff());
+grant insert on public.lista_espera to anon;
+grant select, insert, update on public.lista_espera to authenticated;
+
 -- ── Realtime: la agenda del panel se actualiza sola ──────────────────
 do $$ begin
   alter publication supabase_realtime add table turnos;

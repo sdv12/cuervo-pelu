@@ -124,6 +124,17 @@ const real = {
     if (error) throw error
     return data === true
   },
+
+  async anotarseListaEspera({ fecha, hora, barberoId, servicio, nombre, telefono }) {
+    const { data: sesion } = await supabase.auth.getSession()
+    const { error } = await supabase.from('lista_espera').insert({
+      fecha, hora, servicio,
+      barbero_id: barberoId && barberoId !== CUALQUIERA ? barberoId : null,
+      cliente_nombre: nombre, cliente_telefono: telefono,
+      perfil_id: sesion?.session?.user?.id ?? null,
+    })
+    if (error) throw error
+  },
 }
 
 // ── Implementación mock (sin backend) ─────────────────────────────────
@@ -226,6 +237,10 @@ const mock = {
     if (!turno) return false
     turno.estado = 'cancelado'
     return true
+  },
+
+  async anotarseListaEspera() {
+    await delay(200)
   },
 }
 

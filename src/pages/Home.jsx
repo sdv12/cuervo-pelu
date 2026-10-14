@@ -8,6 +8,7 @@ import Services from '../components/sections/Services'
 import Testimonials from '../components/sections/Testimonials'
 import FidelityCard from '../components/sections/FidelityCard'
 import InfoSection from '../components/sections/InfoSection'
+import InstalarApp from '../components/sections/InstalarApp'
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       <WhyUs />
       <FidelityCard />
       <InfoSection />
+      <InstalarApp />
     </>
   )
 }

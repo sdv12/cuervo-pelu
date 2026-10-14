@@ -9,6 +9,7 @@ import Reportes from './Reportes'
 import Empleados from './Empleados'
 import Productos from './Productos'
 import Actividad from './Actividad'
+import Ayuda from './Ayuda'
 import MiTarjeta from './MiTarjeta'
 
 export default function Panel() {
@@ -21,6 +22,7 @@ export default function Panel() {
         { id: 'productos', label: 'Productos', Comp: Productos },
         ...(esAdmin ? [{ id: 'empleados', label: 'Empleados', Comp: Empleados }] : []),
         ...(esAdmin ? [{ id: 'actividad', label: 'Actividad', Comp: Actividad }] : []),
+        { id: 'ayuda', label: 'Ayuda', Comp: Ayuda },
       ]
     : [{ id: 'tarjeta', label: 'Mi tarjeta', Comp: MiTarjeta }]
 

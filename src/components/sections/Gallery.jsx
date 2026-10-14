@@ -1,4 +1,6 @@
-import { useRef, useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import Autoplay from 'embla-carousel-autoplay'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import BarberProfile from './BarberProfile'
 
@@ -10,66 +12,64 @@ const GRUPOS = [
 ]
 
 function Carrusel({ fotos, prefijo }) {
-  const trackRef = useRef(null)
+  const [emblaRef, embla] = useEmblaCarousel(
+    { loop: true, align: 'start' },
+    [Autoplay({ delay: 4500, stopOnInteraction: true })]
+  )
   const [activo, setActivo] = useState(0)
 
   useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
-    const onScroll = () => {
-      const card = track.firstElementChild
-      if (card) setActivo(Math.round(track.scrollLeft / (card.offsetWidth + 14)))
-    }
-    track.addEventListener('scroll', onScroll, { passive: true })
-    return () => track.removeEventListener('scroll', onScroll)
-  }, [])
+    if (!embla) return
+    const onSelect = () => setActivo(embla.selectedScrollSnap())
+    embla.on('select', onSelect)
+    onSelect()
+    return () => embla.off('select', onSelect)
+  }, [embla])
 
-  function ir(dir) {
-    const track = trackRef.current
-    if (track) track.scrollBy({ left: dir * (track.firstElementChild.offsetWidth + 14), behavior: 'smooth' })
-  }
-
-  const progreso = ((activo + 1) / fotos.length) * 100
+  const anterior = useCallback(() => embla?.scrollPrev(), [embla])
+  const siguiente = useCallback(() => embla?.scrollNext(), [embla])
 
   return (
     <>
       <div className="mb-5 flex items-center justify-end gap-2">
-        <button type="button" onClick={() => ir(-1)} aria-label="Foto anterior"
+        <button type="button" onClick={anterior} aria-label="Foto anterior"
           className="flex h-12 w-12 items-center justify-center rounded-full border-[1.5px] border-azul text-azul hover:bg-azul hover:text-hueso dark:border-navy-text dark:text-navy-text dark:hover:bg-navy-text dark:hover:text-navy">
           <ChevronLeft size={22} />
         </button>
-        <button type="button" onClick={() => ir(1)} aria-label="Foto siguiente"
+        <button type="button" onClick={siguiente} aria-label="Foto siguiente"
           className="flex h-12 w-12 items-center justify-center rounded-full border-[1.5px] border-azul text-azul hover:bg-azul hover:text-hueso dark:border-navy-text dark:text-navy-text dark:hover:bg-navy-text dark:hover:text-navy">
           <ChevronRight size={22} />
         </button>
       </div>
 
-      <div
-        ref={trackRef}
-        className="-mx-5 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-5 pb-4 sm:-mx-6 sm:px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {fotos.map((n, i) => (
-          <figure key={n} className="group relative w-[80vw] max-w-[320px] flex-shrink-0 snap-start overflow-hidden rounded-[18px] bg-azul sm:w-[300px]">
-            <img
-              src={foto(n)}
-              alt={`${prefijo} · corte ${i + 1}`}
-              loading="lazy"
-              className="aspect-[4/5] w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-            <figcaption className="absolute bottom-3 left-3 -skew-x-6 rounded-md bg-rojo px-3 py-1.5 font-display text-[0.9rem] font-semibold uppercase tracking-wider text-hueso">
-              {prefijo} {String(i + 1).padStart(2, '0')}
-            </figcaption>
-          </figure>
-        ))}
+      <div className="-mx-5 overflow-hidden sm:-mx-6" ref={emblaRef}>
+        <div className="flex gap-3.5 px-5 sm:px-6">
+          {fotos.map((n, i) => (
+            <figure key={n} className="group relative w-[80vw] max-w-[320px] flex-shrink-0 overflow-hidden rounded-[18px] bg-azul sm:w-[300px]">
+              <img
+                src={foto(n)}
+                alt={`${prefijo} · corte ${i + 1}`}
+                loading="lazy"
+                className="aspect-[4/5] w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <figcaption className="absolute bottom-3 left-3 -skew-x-6 rounded-md bg-rojo px-3 py-1.5 font-display text-[0.9rem] font-semibold uppercase tracking-wider text-hueso">
+                {prefijo} {String(i + 1).padStart(2, '0')}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-2 flex items-center gap-4">
-        <div className="h-[4px] flex-1 overflow-hidden rounded-full bg-linea dark:bg-navy-border">
-          <div className="h-full rounded-full bg-rojo transition-[width] duration-300" style={{ width: `${progreso}%` }} />
-        </div>
-        <span className="font-display text-[1rem] tabular-nums text-azul dark:text-navy-text">
-          {String(activo + 1).padStart(2, '0')} <span className="text-tinta-suave dark:text-navy-soft">/ {String(fotos.length).padStart(2, '0')}</span>
-        </span>
+      <div className="mt-3 flex items-center justify-center gap-2">
+        {fotos.map((n, i) => (
+          <button
+            key={n}
+            type="button"
+            aria-label={`Ir a la foto ${i + 1}`}
+            onClick={() => embla?.scrollTo(i)}
+            className={`h-2.5 rounded-full transition-all ${i === activo ? 'w-6 bg-rojo' : 'w-2.5 bg-linea dark:bg-navy-border'}`}
+          />
+        ))}
       </div>
     </>
   )

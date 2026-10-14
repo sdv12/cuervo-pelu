@@ -1,7 +1,8 @@
-import { useRef } from 'react'
-import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, CheckCircle2, BellRing, Check } from 'lucide-react'
 import { useBooking } from '../../context/BookingContext'
-import { CUALQUIERA } from '../../services/bookingService'
+import { useAuth } from '../../context/AuthContext'
+import bookingService, { CUALQUIERA } from '../../services/bookingService'
 import { getTurnosDelDia, getTurnosDelDiaCombinado, fechaISO, pasoPorRol } from '../../utils/businessDays'
 
 function rangoDeMeses(dias) {
@@ -28,7 +29,12 @@ function FlechaDias({ dir, onClick }) {
 // que queda por decidir.
 export default function StepFechaHora() {
   const { state, diasHabiles, seleccionarDia, seleccionarHora, irAPaso } = useBooking()
+  const { perfil } = useAuth()
   const scrollRef = useRef(null)
+  const [esperaHora, setEsperaHora] = useState(null)
+  const [esperaNombre, setEsperaNombre] = useState(perfil?.nombre || '')
+  const [esperaTelefono, setEsperaTelefono] = useState(perfil?.telefono || '')
+  const [esperaEnviada, setEsperaEnviada] = useState(null)
   const ocupados = state.horariosOcupados || []
   const barbero = state.barberoId !== CUALQUIERA ? state.staff.find(s => s.id === state.barberoId) : null
   const turnos = !state.dayDate ? [] : barbero
@@ -39,6 +45,16 @@ export default function StepFechaHora() {
 
   function desplazar(dir) {
     scrollRef.current?.scrollBy({ left: dir * 180, behavior: 'smooth' })
+  }
+
+  async function anotarEspera() {
+    if (!esperaNombre.trim() || !esperaTelefono.trim()) return
+    await bookingService.anotarseListaEspera({
+      fecha: state.dayIso, hora: esperaHora, barberoId: state.barberoId,
+      servicio: state.service, nombre: esperaNombre.trim(), telefono: esperaTelefono.trim(),
+    })
+    setEsperaEnviada(esperaHora)
+    setEsperaHora(null)
   }
 
   return (
@@ -90,26 +106,67 @@ export default function StepFechaHora() {
               <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))] sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {grupo.horarios.map(t => {
                   const pasado = esHoy && t <= horaActual
-                  const ocupado = ocupados.includes(t) || pasado
+                  const tomado = ocupados.includes(t) && !pasado
+                  const ocupado = tomado || pasado
                   const selected = state.time === t
+                  const avisado = esperaEnviada === t
                   return (
                     <button
                       key={t}
                       type="button"
-                      disabled={ocupado}
-                      title={pasado ? 'Ese horario ya pasó' : ocupado ? 'Ese horario ya está reservado' : undefined}
-                      onClick={() => seleccionarHora(t)}
-                      className={`min-h-[52px] min-w-[84px] flex-shrink-0 snap-start rounded-lg border-[1.5px] bg-white px-3 py-3 text-center text-[1rem] sm:min-w-0 active:scale-[0.97] dark:bg-navy-card
-                        ${ocupado ? 'cursor-not-allowed border-linea opacity-35 line-through dark:border-navy-border' : 'border-linea dark:border-navy-border'}
+                      disabled={pasado || avisado}
+                      title={pasado ? 'Ese horario ya pasó' : tomado ? 'Ocupado — tocá para anotarte en lista de espera' : undefined}
+                      onClick={() => (tomado ? (avisado ? null : setEsperaHora(t)) : seleccionarHora(t))}
+                      className={`relative min-h-[52px] min-w-[84px] flex-shrink-0 snap-start rounded-lg border-[1.5px] bg-white px-3 py-3 text-center text-[1rem] sm:min-w-0 active:scale-[0.97] dark:bg-navy-card
+                        ${ocupado ? 'border-linea opacity-35 line-through dark:border-navy-border' : 'border-linea dark:border-navy-border'}
+                        ${pasado ? 'cursor-not-allowed' : ''}
+                        ${tomado && !avisado ? 'cursor-pointer opacity-60 line-through decoration-1' : ''}
                         ${selected ? 'border-rojo bg-rojo/[0.06] font-semibold text-rojo dark:bg-rojo/10' : ''}`}
                     >
                       {t}
+                      {avisado && <BellRing size={12} className="absolute right-1 top-1 text-rojo" />}
                     </button>
                   )
                 })}
               </div>
+
+              {esperaHora && grupo.horarios.includes(esperaHora) && (
+                <div className="mt-3 rounded-xl border-[1.5px] border-dashed border-rojo/50 bg-rojo/[0.04] p-4 dark:bg-rojo/10">
+                  <p className="mb-2.5 flex items-center gap-1.5 text-[0.9rem] font-semibold text-azul dark:text-navy-text">
+                    <BellRing size={16} className="text-rojo" /> Avisarme si se libera el {esperaHora}
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      value={esperaNombre} onChange={e => setEsperaNombre(e.target.value)}
+                      placeholder="Tu nombre"
+                      className="w-full rounded-lg border-[1.5px] border-linea bg-white px-3 py-2.5 text-base dark:border-navy-border dark:bg-navy dark:text-navy-text"
+                    />
+                    <input
+                      value={esperaTelefono} onChange={e => setEsperaTelefono(e.target.value)} type="tel"
+                      placeholder="Tu teléfono"
+                      className="w-full rounded-lg border-[1.5px] border-linea bg-white px-3 py-2.5 text-base dark:border-navy-border dark:bg-navy dark:text-navy-text"
+                    />
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button type="button" className="btn-ghost btn-small" onClick={() => setEsperaHora(null)}>Cancelar</button>
+                    <button
+                      type="button"
+                      className="btn-primary btn-small flex-1 justify-center"
+                      disabled={!esperaNombre.trim() || !esperaTelefono.trim()}
+                      onClick={anotarEspera}
+                    >
+                      Anotarme
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
+          {esperaEnviada && (
+            <p className="mt-2 flex items-center gap-1.5 text-[0.85rem] font-semibold text-green-700 dark:text-green-400">
+              <Check size={15} /> Listo, te avisamos por WhatsApp si se libera el {esperaEnviada}.
+            </p>
+          )}
         </div>
       )}
 

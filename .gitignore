@@ -6,3 +6,4 @@ dist
 # Local Netlify folder
 .netlify
 assets-originales/
+dev-dist/

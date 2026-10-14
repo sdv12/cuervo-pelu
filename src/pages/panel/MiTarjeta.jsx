@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { CalendarPlus, X } from 'lucide-react'
+import { CalendarPlus, X, Zap, MessageCircle } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { panelService } from '../../services/panelService'
 import { BookingProvider } from '../../context/BookingContext'
 import BookingWidget from '../../components/booking/BookingWidget'
+import bookingService from '../../services/bookingService'
+import { getProximosDiasHabiles, getHorariosDelDia, pasoPorRol } from '../../utils/businessDays'
+import { WHATSAPP_NUMBER } from '../../config/contact'
 import { formatearPrecio } from '../../utils/formato'
 
 const ESTADO_STYLE = {
@@ -47,6 +50,7 @@ export default function MiTarjeta() {
 
   const cortes = ficha?.cortes_count ?? 0
   const sellos = cortes > 0 && cortes % 5 === 0 ? 5 : cortes % 5
+  const ultimoCorte = turnos.find(t => t.estado === 'completado')
 
   if (cargando) return <p className="loading-note">Cargando tu info...</p>
 
@@ -68,6 +72,14 @@ export default function MiTarjeta() {
             : 'Cargá tu teléfono en el perfil para asociar tu tarjeta de fidelidad (por ahora se lleva por número).'}
         </p>
       </div>
+
+      {ultimoCorte && (
+        <TurnoExpress
+          ultimoCorte={ultimoCorte}
+          perfil={perfil}
+          onReservado={() => { setReservando(false); cargar() }}
+        />
+      )}
 
       <div className="mb-2 mt-6 flex items-center justify-between gap-2">
         <h2 className="text-[0.78rem] font-semibold uppercase tracking-wide text-tinta-suave dark:text-navy-soft">Mis turnos</h2>
@@ -117,6 +129,107 @@ export default function MiTarjeta() {
           )
         })}
       </div>
+    </div>
+  )
+}
+
+// "Repetime el último corte, con Cristian, lo antes posible" — sin pasar
+// por el wizard: busca el próximo horario libre de Cristian y reserva
+// directo con un toque.
+function TurnoExpress({ ultimoCorte, perfil, onReservado }) {
+  const [estado, setEstado] = useState('inicial') // inicial | buscando | encontrado | sin_cupo | reservando | error
+  const [propuesta, setPropuesta] = useState(null) // { dia, hora, cristian, servicio, precio }
+
+  async function buscar() {
+    setEstado('buscando')
+    try {
+      const staff = await bookingService.getStaff()
+      const cristian = staff.find(s => s.rol === 'admin')
+      if (!cristian) { setEstado('sin_cupo'); return }
+
+      const servicios = await bookingService.getServicios()
+      // Si el servicio de aquel corte ya no existe tal cual (cambió de
+      // nombre o se dio de baja), repetimos el destacado del catálogo
+      // actual en vez de arrastrar un precio viejo.
+      const vigente = servicios.find(s => s.nombre === ultimoCorte.servicio)
+        || servicios.find(s => s.destacado) || servicios[0]
+      if (!vigente) { setEstado('sin_cupo'); return }
+      const { nombre: servicio, precio } = vigente
+
+      const paso = pasoPorRol(cristian.rol)
+      for (const dia of getProximosDiasHabiles(7)) {
+        const ocupados = await bookingService.getHorariosOcupados(dia.iso, cristian.id)
+        const horaActual = dia.nombreDia === 'Hoy' ? new Date().toTimeString().slice(0, 5) : null
+        const libre = getHorariosDelDia(dia.fecha, paso).find(h => !ocupados.includes(h) && (!horaActual || h > horaActual))
+        if (libre) {
+          setPropuesta({ dia, hora: libre, cristian, servicio, precio })
+          setEstado('encontrado')
+          return
+        }
+      }
+      setEstado('sin_cupo')
+    } catch {
+      setEstado('error')
+    }
+  }
+
+  async function confirmar() {
+    setEstado('reservando')
+    try {
+      const res = await bookingService.guardarTurno({
+        fecha: propuesta.dia.iso, hora: propuesta.hora, servicio: propuesta.servicio, precio: propuesta.precio,
+        nombre: perfil.nombre, telefono: perfil.telefono, barberoId: propuesta.cristian.id,
+      })
+      if (!res.ok) { setEstado('sin_cupo'); return }
+      const mensaje = `Hola! Reservé por Turno Express: ${propuesta.servicio} con Cristian el ${propuesta.dia.label} a las ${propuesta.hora}.`
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`, '_blank')
+      onReservado()
+    } catch {
+      setEstado('error')
+    }
+  }
+
+  return (
+    <div className="mt-6 rounded-2xl border-[1.5px] border-dashed border-rojo/50 bg-rojo/[0.04] p-5 dark:bg-rojo/10">
+      <h2 className="flex items-center gap-1.5 text-[0.98rem] font-semibold text-azul dark:text-navy-text">
+        <Zap size={17} className="text-rojo" /> Turno Express
+      </h2>
+      <p className="mt-1 text-[0.85rem] text-tinta-suave dark:text-navy-soft">
+        Repetí tu último corte ({ultimoCorte.servicio}) con Cristian, en el horario más próximo que haya libre.
+      </p>
+
+      {estado === 'inicial' && (
+        <button type="button" className="btn-primary btn-small mt-3" onClick={buscar}>
+          Buscar el próximo libre
+        </button>
+      )}
+      {estado === 'buscando' && <p className="loading-note mt-3">Buscando el próximo horario con Cristian...</p>}
+      {estado === 'sin_cupo' && (
+        <p className="mt-3 text-[0.85rem] font-semibold text-rojo">No encontramos un horario libre con Cristian en los próximos días. Probá reservar manualmente.</p>
+      )}
+      {estado === 'error' && (
+        <p className="mt-3 text-[0.85rem] font-semibold text-rojo">No pudimos buscar un turno ahora. Probá de nuevo en un momento.</p>
+      )}
+      {(estado === 'encontrado' || estado === 'reservando') && propuesta && (
+        <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg bg-white px-4 py-3 dark:bg-navy-card">
+          <div>
+            <strong className="block text-[0.95rem] text-azul dark:text-navy-text">
+              {propuesta.dia.label} a las {propuesta.hora}
+            </strong>
+            <span className="text-[0.82rem] text-tinta-suave dark:text-navy-soft">
+              {propuesta.servicio} · {formatearPrecio(propuesta.precio)} · con Cristian
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={estado === 'reservando'}
+            onClick={confirmar}
+            className="btn-primary btn-small ml-auto"
+          >
+            <MessageCircle size={15} /> {estado === 'reservando' ? 'Reservando...' : 'Confirmar por WhatsApp'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -132,6 +132,23 @@ export const panelService = {
     return filas.map(f => ({ ...f, perfil_nombre: f.perfil_id ? (nombres[f.perfil_id] || 'Ex-usuario') : 'Cliente' }))
   },
 
+  // ── Lista de espera ──────────────────────────────────────────────────
+  async getListaEspera({ fecha }) {
+    const { data, error } = await supabase.from('lista_espera').select('*')
+      .eq('fecha', fecha).eq('estado', 'pendiente')
+      .order('hora', { ascending: true })
+    if (error) throw error
+    return data || []
+  },
+  async marcarEsperaAvisado(id) {
+    const { error } = await supabase.from('lista_espera').update({ estado: 'avisado' }).eq('id', id)
+    if (error) throw error
+  },
+  async borrarEspera(id) {
+    const { error } = await supabase.from('lista_espera').update({ estado: 'cancelado' }).eq('id', id)
+    if (error) throw error
+  },
+
   // Realtime: llama a `callback` ante cualquier cambio en la tabla turnos.
   suscribirTurnos(callback) {
     const canal = supabase

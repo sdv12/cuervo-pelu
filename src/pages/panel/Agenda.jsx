@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Check, X, RotateCcw, Banknote, CreditCard, UserPlus } from 'lucide-react'
+import { Check, X, RotateCcw, Banknote, CreditCard, UserPlus, BellRing, MessageCircle } from 'lucide-react'
 import { panelService } from '../../services/panelService'
 import bookingService from '../../services/bookingService'
 import { useAuth } from '../../context/AuthContext'
@@ -172,6 +172,64 @@ export default function Agenda() {
           </table>
         </div>
       )}
+
+      <ListaEspera fecha={fecha} />
+    </div>
+  )
+}
+
+function ListaEspera({ fecha }) {
+  const [espera, setEspera] = useState([])
+  const [cargando, setCargando] = useState(true)
+
+  const cargar = useCallback(async () => {
+    setCargando(true)
+    try { setEspera(await panelService.getListaEspera({ fecha })) } catch { setEspera([]) }
+    setCargando(false)
+  }, [fecha])
+
+  useEffect(() => { cargar() }, [cargar])
+
+  async function avisado(id) {
+    await panelService.marcarEsperaAvisado(id)
+    cargar()
+  }
+  async function quitar(id) {
+    await panelService.borrarEspera(id)
+    cargar()
+  }
+
+  if (cargando || espera.length === 0) return null
+
+  return (
+    <div className="mt-6">
+      <h2 className="mb-2 flex items-center gap-1.5 text-[0.78rem] font-semibold uppercase tracking-wide text-tinta-suave dark:text-navy-soft">
+        <BellRing size={14} /> Lista de espera ({espera.length})
+      </h2>
+      <div className="overflow-hidden rounded-xl border border-linea dark:border-navy-border">
+        {espera.map(e => (
+          <div key={e.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-linea/60 px-3 py-2.5 text-[0.85rem] last:border-0 dark:border-navy-border/60">
+            <div className="min-w-0">
+              <span className="font-semibold text-azul dark:text-navy-text">{String(e.hora).slice(0, 5)} · {e.cliente_nombre}</span>
+              <span className="block text-[0.75rem] text-tinta-suave dark:text-navy-soft">{e.servicio || 'Sin servicio especificado'}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <a href={`https://wa.me/${e.cliente_telefono}`} target="_blank" rel="noopener"
+                className="flex items-center gap-1 rounded-md bg-green-500/15 px-2 py-1 text-[0.78rem] font-semibold text-green-700 hover:bg-green-500/25 dark:text-green-400">
+                <MessageCircle size={13} /> Avisar
+              </a>
+              <button onClick={() => avisado(e.id)} title="Marcar como avisado"
+                className="rounded-md bg-azul/10 p-1.5 text-azul hover:bg-azul/20 dark:bg-navy-soft/20 dark:text-navy-text">
+                <Check size={14} />
+              </button>
+              <button onClick={() => quitar(e.id)} title="Quitar de la lista"
+                className="rounded-md bg-rojo/10 p-1.5 text-rojo hover:bg-rojo/20">
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
