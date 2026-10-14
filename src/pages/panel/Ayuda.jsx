@@ -1,6 +1,46 @@
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { NOVEDADES } from '../../data/novedades'
+
+function fechaLarga(iso) {
+  return new Date(iso + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function Novedades() {
+  const [verTodas, setVerTodas] = useState(false)
+  const visibles = verTodas ? NOVEDADES : NOVEDADES.slice(0, 2)
+
+  return (
+    <div className="mb-6 rounded-xl border-[1.5px] border-dashed border-rojo/50 bg-rojo/[0.04] p-4 dark:bg-rojo/10">
+      <h2 className="mb-3 flex items-center gap-2 text-[0.98rem] font-semibold text-azul dark:text-navy-text">
+        <Sparkles size={17} className="text-rojo" /> Lo último que se sumó a la página
+      </h2>
+      <div className="flex flex-col gap-3.5">
+        {visibles.map(n => (
+          <div key={n.version} className="rounded-lg bg-white p-3.5 dark:bg-navy-card">
+            <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.72rem] font-semibold uppercase tracking-wide text-tinta-suave dark:text-navy-soft">
+              <span>{fechaLarga(n.fecha)}</span>
+              <span>·</span>
+              <span>versión {n.version}</span>
+            </div>
+            <h3 className="mb-1 text-[0.95rem] font-semibold text-azul dark:text-navy-text">{n.titulo}</h3>
+            <p className="text-[0.88rem] leading-relaxed text-tinta-suave dark:text-navy-soft">{n.texto}</p>
+          </div>
+        ))}
+      </div>
+      {NOVEDADES.length > 2 && (
+        <button
+          type="button"
+          onClick={() => setVerTodas(v => !v)}
+          className="mt-3 text-[0.82rem] font-semibold text-rojo hover:underline"
+        >
+          {verTodas ? 'Ver menos' : `Ver todo el historial (${NOVEDADES.length})`}
+        </button>
+      )}
+    </div>
+  )
+}
 
 function Item({ titulo, children, abiertoPorDefecto }) {
   const [abierto, setAbierto] = useState(!!abiertoPorDefecto)
@@ -29,8 +69,11 @@ export default function Ayuda() {
         Una guía rápida de para qué sirve cada pestaña. Tocá cada una para desplegarla.
       </p>
 
-      <div className="mt-4 rounded-xl border border-linea bg-white px-4 dark:border-navy-border dark:bg-navy-card">
-        <Item titulo="📅 Agenda" abiertoPorDefecto>
+      <div className="mt-4">
+        {esAdmin && <Novedades />}
+
+        <div className="rounded-xl border border-linea bg-white px-4 dark:border-navy-border dark:bg-navy-card">
+          <Item titulo="📅 Agenda" abiertoPorDefecto>
           <p>Acá ves los turnos del día (cambiá la fecha arriba a la derecha). Para cada turno podés:</p>
           <ul className="ml-4 mt-2 list-disc space-y-1">
             <li><strong>✓ verde</strong>: marcarlo completado — te pregunta cómo pagó (efectivo o transferencia).</li>
@@ -62,9 +105,10 @@ export default function Ayuda() {
           </Item>
         )}
 
-        <Item titulo="❓ ¿Algo no funciona o tenés una duda?">
-          <p>Escribile a Sergio (el que armó la página) y lo revisa.</p>
-        </Item>
+          <Item titulo="❓ ¿Algo no funciona o tenés una duda?">
+            <p>Escribile a Sergio (el que armó la página) y lo revisa.</p>
+          </Item>
+        </div>
       </div>
     </div>
   )

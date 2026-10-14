@@ -1,6 +1,12 @@
+import { MessageSquareWarning } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 import { INSTAGRAM_URL } from '../../config/contact'
 import pkg from '../../../package.json'
+
+const REPORTE_EMAIL = 'sdvillegas12@gmail.com'
+const REPORTE_ASUNTO = 'Cuervo Peluquería — reporte / sugerencia'
+const REPORTE_CUERPO = 'Contame qué pasó o qué se te ocurre:\n\n'
+const REPORTE_HREF = `mailto:${REPORTE_EMAIL}?subject=${encodeURIComponent(REPORTE_ASUNTO)}&body=${encodeURIComponent(REPORTE_CUERPO)}`
 
 export default function Footer() {
   return (
@@ -10,11 +16,14 @@ export default function Footer() {
           <BrandLogo className="h-8 w-8 ring-navy-border" />
           <span className="font-display font-semibold text-white">Cuervo Peluquería</span>
         </div>
-        <div className="flex gap-5 text-[0.88rem]">
+        <div className="flex flex-wrap gap-5 text-[0.88rem]">
           <a href="#servicios" className="text-navy-soft no-underline hover:text-white">Servicios</a>
           <a href="#turnos" className="text-navy-soft no-underline hover:text-white">Turnos</a>
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener" className="text-navy-soft no-underline hover:text-white">
             Instagram
+          </a>
+          <a href={REPORTE_HREF} className="flex items-center gap-1.5 text-navy-soft no-underline hover:text-white">
+            <MessageSquareWarning size={15} /> Reportar un error / sugerencia
           </a>
         </div>
       </div>

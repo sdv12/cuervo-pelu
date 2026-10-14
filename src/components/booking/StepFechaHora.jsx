@@ -109,7 +109,7 @@ export default function StepFechaHora() {
                   {grupo.label}
                 </p>
               )}
-              <div className="-mx-5 flex snap-x gap-2 overflow-x-auto overscroll-x-contain px-5 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))] sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="-mx-5 flex snap-x gap-2 overflow-x-auto overscroll-x-contain scroll-px-5 px-5 pb-1 sm:mx-0 sm:scroll-px-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))] sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {grupo.horarios.map(t => {
                   const pasado = esHoy && t <= horaActual
                   const tomado = ocupados.includes(t) && !pasado

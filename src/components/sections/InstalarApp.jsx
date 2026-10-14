@@ -75,13 +75,13 @@ export default function InstalarApp() {
         </div>
 
         {tab === 'ios' ? (
-          <ol className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <ol className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-px-5 px-5 pb-2 sm:mx-0 sm:scroll-px-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <PasoInstalacion n={1} icono={Share} texto="Abrí cuervo-pelu.netlify.app en Safari y tocá el ícono de Compartir (el cuadradito con la flecha hacia arriba)." />
             <PasoInstalacion n={2} icono={PlusSquare} texto={'Elegí "Agregar a la pantalla de inicio".'} />
             <PasoInstalacion n={3} icono={Smartphone} texto={'Confirmá tocando "Agregar". Ya tenés a Cuervo como un ícono más, igual que cualquier app.'} />
           </ol>
         ) : (
-          <ol className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <ol className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-px-5 px-5 pb-2 sm:mx-0 sm:scroll-px-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <PasoInstalacion n={1} icono={MoreVertical} texto="Abrí cuervo-pelu.netlify.app en Chrome y tocá los tres puntitos de arriba a la derecha." />
             <PasoInstalacion n={2} icono={Download} texto={'Elegí "Instalar app" (o "Agregar a pantalla de inicio").'} />
             <PasoInstalacion n={3} icono={Smartphone} texto="Confirmá y listo — o si ves el botón de arriba, tocalo directamente y te ahorrás estos pasos." />
