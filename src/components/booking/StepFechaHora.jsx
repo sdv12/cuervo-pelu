@@ -35,6 +35,7 @@ export default function StepFechaHora() {
   const [esperaNombre, setEsperaNombre] = useState(perfil?.nombre || '')
   const [esperaTelefono, setEsperaTelefono] = useState(perfil?.telefono || '')
   const [esperaEnviada, setEsperaEnviada] = useState(null)
+  const [esperaError, setEsperaError] = useState(null)
   const ocupados = state.horariosOcupados || []
   const barbero = state.barberoId !== CUALQUIERA ? state.staff.find(s => s.id === state.barberoId) : null
   const turnos = !state.dayDate ? [] : barbero
@@ -49,12 +50,17 @@ export default function StepFechaHora() {
 
   async function anotarEspera() {
     if (!esperaNombre.trim() || !esperaTelefono.trim()) return
-    await bookingService.anotarseListaEspera({
-      fecha: state.dayIso, hora: esperaHora, barberoId: state.barberoId,
-      servicio: state.service, nombre: esperaNombre.trim(), telefono: esperaTelefono.trim(),
-    })
-    setEsperaEnviada(esperaHora)
-    setEsperaHora(null)
+    setEsperaError(null)
+    try {
+      await bookingService.anotarseListaEspera({
+        fecha: state.dayIso, hora: esperaHora, barberoId: state.barberoId,
+        servicio: state.service, nombre: esperaNombre.trim(), telefono: esperaTelefono.trim(),
+      })
+      setEsperaEnviada(esperaHora)
+      setEsperaHora(null)
+    } catch {
+      setEsperaError('No pudimos anotarte ahora. Probá escribiendo directo por WhatsApp.')
+    }
   }
 
   return (
@@ -68,7 +74,7 @@ export default function StepFechaHora() {
 
       <div className="relative">
         <FlechaDias dir={-1} onClick={() => desplazar(-1)} />
-        <div ref={scrollRef} className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1.5">
+        <div ref={scrollRef} className="-mx-1 flex gap-2.5 overflow-x-auto overscroll-x-contain px-1 pb-1.5">
           {diasHabiles.map(d => {
             const selected = state.dayIso === d.iso
             return (
@@ -103,7 +109,7 @@ export default function StepFechaHora() {
                   {grupo.label}
                 </p>
               )}
-              <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))] sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="-mx-5 flex snap-x gap-2 overflow-x-auto overscroll-x-contain px-5 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(78px,1fr))] sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {grupo.horarios.map(t => {
                   const pasado = esHoy && t <= horaActual
                   const tomado = ocupados.includes(t) && !pasado
@@ -158,6 +164,7 @@ export default function StepFechaHora() {
                       Anotarme
                     </button>
                   </div>
+                  {esperaError && <p className="mt-2 text-[0.82rem] font-semibold text-rojo">{esperaError}</p>}
                 </div>
               )}
             </div>

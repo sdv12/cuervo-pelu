@@ -95,7 +95,7 @@ export default function Agenda() {
           No hay turnos para este día.
         </p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overscroll-x-contain">
           <table className="w-full min-w-[580px] border-collapse text-[0.88rem]">
             <thead>
               <tr className="border-b border-linea text-left text-[0.72rem] uppercase tracking-wide text-tinta-suave dark:border-navy-border dark:text-navy-soft">

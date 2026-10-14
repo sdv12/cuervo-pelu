@@ -23,7 +23,7 @@ export default function StepTurno() {
       {state.serviciosCargando ? (
         <p className="loading-note">Consultando servicios...</p>
       ) : (
-        <div className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto -mx-5 px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-2.5 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain -mx-5 px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-2.5 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {state.servicios.map(s => {
             const selected = state.service === s.nombre
             return (
@@ -43,7 +43,7 @@ export default function StepTurno() {
       )}
 
       <h3 className="mb-3 mt-7 text-[1.2rem] uppercase text-azul dark:text-navy-text">¿Quién te atiende?</h3>
-      <div className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto -mx-5 px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-2.5 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain -mx-5 px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-2.5 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
           onClick={() => seleccionarBarbero(CUALQUIERA)}

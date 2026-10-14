@@ -50,7 +50,7 @@ export default function Panel() {
           <ThemeToggle />
         </div>
         {tabs.length > 1 && (
-          <div className="mx-auto flex max-w-[1080px] gap-1 overflow-x-auto px-4 sm:px-6">
+          <div className="mx-auto flex max-w-[1080px] gap-1 overflow-x-auto overscroll-x-contain px-4 sm:px-6">
             {tabs.map(t => (
               <button
                 key={t.id}
