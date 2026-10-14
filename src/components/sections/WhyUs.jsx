@@ -14,11 +14,11 @@ export default function WhyUs() {
             No competimos por ser los más grandes del barrio, sino por ser los que mejor te atienden.
           </p>
         </div>
-        <div className="grid grid-cols-1 border-y border-linea dark:border-navy-border md:grid-cols-3">
-          {ITEMS.map((item, i) => (
+        <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {ITEMS.map(item => (
             <div
               key={item.titulo}
-              className={`px-7 py-6.5 ${i > 0 ? 'border-t border-linea dark:border-navy-border md:border-t-0 md:border-l' : ''}`}
+              className="w-[80vw] max-w-[320px] flex-shrink-0 snap-start rounded-xl border border-linea bg-white px-6 py-6.5 dark:border-navy-border dark:bg-navy-card sm:w-auto sm:max-w-none"
             >
               <h3 className="mb-2 text-[1.05rem] uppercase text-rojo">{item.titulo}</h3>
               <p className="m-0 text-[0.95rem] text-tinta-suave dark:text-navy-soft">{item.texto}</p>

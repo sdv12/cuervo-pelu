@@ -75,13 +75,13 @@ export default function InstalarApp() {
         </div>
 
         {tab === 'ios' ? (
-          <ol className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <ol className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <PasoInstalacion n={1} icono={Share} texto="Abrí cuervo-pelu.netlify.app en Safari y tocá el ícono de Compartir (el cuadradito con la flecha hacia arriba)." />
             <PasoInstalacion n={2} icono={PlusSquare} texto={'Elegí "Agregar a la pantalla de inicio".'} />
             <PasoInstalacion n={3} icono={Smartphone} texto={'Confirmá tocando "Agregar". Ya tenés a Cuervo como un ícono más, igual que cualquier app.'} />
           </ol>
         ) : (
-          <ol className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <ol className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <PasoInstalacion n={1} icono={MoreVertical} texto="Abrí cuervo-pelu.netlify.app en Chrome y tocá los tres puntitos de arriba a la derecha." />
             <PasoInstalacion n={2} icono={Download} texto={'Elegí "Instalar app" (o "Agregar a pantalla de inicio").'} />
             <PasoInstalacion n={3} icono={Smartphone} texto="Confirmá y listo — o si ves el botón de arriba, tocalo directamente y te ahorrás estos pasos." />
@@ -94,7 +94,7 @@ export default function InstalarApp() {
 
 function PasoInstalacion({ n, icono: Icono, texto }) {
   return (
-    <li className="flex flex-col gap-2.5 rounded-xl border border-linea bg-white p-4.5 dark:border-navy-border dark:bg-navy-card">
+    <li className="flex w-[80vw] max-w-[300px] flex-shrink-0 snap-start flex-col gap-2.5 rounded-xl border border-linea bg-white p-4.5 dark:border-navy-border dark:bg-navy-card sm:w-auto sm:max-w-none">
       <div className="flex items-center gap-2.5">
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-rojo text-[0.9rem] font-bold text-white">{n}</span>
         <Icono size={20} className="text-rojo" />

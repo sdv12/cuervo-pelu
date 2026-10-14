@@ -36,11 +36,11 @@ export default function Testimonials() {
           </a>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TESTIMONIOS.map(t => (
             <div
               key={t.autor}
-              className="flex flex-col gap-3 rounded-xl border border-linea bg-white p-5 dark:border-navy-border dark:bg-navy-card"
+              className="flex w-[80vw] max-w-[320px] flex-shrink-0 snap-start flex-col gap-3 rounded-xl border border-linea bg-white p-5 dark:border-navy-border dark:bg-navy-card sm:w-auto sm:max-w-none"
             >
               <Estrellas n={t.estrellas} />
               <p className="m-0 flex-1 text-[0.95rem] text-tinta dark:text-navy-text">&quot;{t.texto}&quot;</p>
